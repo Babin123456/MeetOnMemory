@@ -6,6 +6,7 @@ if (!repository) {
 const [owner, repo] = repository.split("/");
 
 async function fetchContributors() {
+  const PER_PAGE =100;
   const headers = {
     Accept: "application/vnd.github+json",
   };
@@ -13,20 +14,25 @@ async function fetchContributors() {
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
-  const response = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contributors`,
-    { headers },
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch contributors: ${response.status} ${response.statusText}`,
-    );
+  let page=1;
+  const contributors = [];
+  while(true){
+    const url=`https://api.github.com/repos/${owner}/${repo}/contributors?per_page=${PER_PAGE}&page=${page}`
+    const response = await fetch(url,{ headers });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch contributors: ${response.status} ${response.statusText}`,
+      );
+    }
+    const data=await response.json();
+    contributors.push(...data)
+    if(data.length<PER_PAGE) break
+    page++;
   }
-  const data = await response.json();
-  return data;
+  return contributors.filter((contributor)=>contributor.type==="User");
 }
 
-function generateContributorHTML(contributors) {
+function generateContributorHtml(contributors) {
   let html = "";
   for (const contributor of contributors) {
     html += `<a href="${contributor.html_url}">
@@ -60,7 +66,7 @@ async function updateReadme(html) {
 
 async function main() {
   const contributors = await fetchContributors();
-  const html = generateContributorHTML(contributors);
+  const html = generateContributorHtml(contributors);
   await updateReadme(html);
   console.log("README.md updated successfully.");
 }

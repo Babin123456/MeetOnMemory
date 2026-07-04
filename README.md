@@ -398,6 +398,8 @@ Thanks to all the amazing contributors who have helped improve MeetOnMemory!
             <img src="https://avatars.githubusercontent.com/u/278401462?v=4" width="75" alt="aadhish-saini"/>
         </a><a href="https://github.com/Payal29037">
             <img src="https://avatars.githubusercontent.com/u/185815252?v=4" width="75" alt="Payal29037"/>
+        </a><a href="https://github.com/mrunmayeekokitkar">
+            <img src="https://avatars.githubusercontent.com/u/184808271?v=4" width="75" alt="mrunmayeekokitkar"/>
         </a><a href="https://github.com/Aaryanvyas">
             <img src="https://avatars.githubusercontent.com/u/188873438?v=4" width="75" alt="Aaryanvyas"/>
         </a><a href="https://github.com/BhaveshGadling77">
