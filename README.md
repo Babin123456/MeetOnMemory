@@ -390,13 +390,29 @@ Track decisions, action items, and organizational growth.
 Thanks to all the amazing contributors who have helped improve MeetOnMemory!
 
 <div align="center">
-  <a href="https://github.com/imuniqueshiv/MeetOnMemory/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=imuniqueshiv/MeetOnMemory&max=100" alt="MeetOnMemory contributors" />
-  </a>
-  <br />
-  <a href="https://github.com/imuniqueshiv/MeetOnMemory/graphs/contributors">
-    View all contributors
-  </a>
+<!-- CONTRIBUTORS:START -->
+
+<a href="https://github.com/imuniqueshiv">
+            <img src="https://avatars.githubusercontent.com/u/144125626?v=4" width="75" alt="imuniqueshiv"/>
+        </a><a href="https://github.com/aadhish-saini">
+            <img src="https://avatars.githubusercontent.com/u/278401462?v=4" width="75" alt="aadhish-saini"/>
+        </a><a href="https://github.com/Payal29037">
+            <img src="https://avatars.githubusercontent.com/u/185815252?v=4" width="75" alt="Payal29037"/>
+        </a><a href="https://github.com/mrunmayeekokitkar">
+            <img src="https://avatars.githubusercontent.com/u/184808271?v=4" width="75" alt="mrunmayeekokitkar"/>
+        </a><a href="https://github.com/Aaryanvyas">
+            <img src="https://avatars.githubusercontent.com/u/188873438?v=4" width="75" alt="Aaryanvyas"/>
+        </a><a href="https://github.com/BhaveshGadling77">
+            <img src="https://avatars.githubusercontent.com/u/188820144?v=4" width="75" alt="BhaveshGadling77"/>
+        </a><a href="https://github.com/itxhadi27-cmd">
+            <img src="https://avatars.githubusercontent.com/u/222145496?v=4" width="75" alt="itxhadi27-cmd"/>
+        </a><a href="https://github.com/CodeWithShrey-collab">
+            <img src="https://avatars.githubusercontent.com/u/179368106?v=4" width="75" alt="CodeWithShrey-collab"/>
+        </a><a href="https://github.com/Khushi1310-nayak">
+            <img src="https://avatars.githubusercontent.com/u/221927504?v=4" width="75" alt="Khushi1310-nayak"/>
+        </a>
+
+<!-- CONTRIBUTORS:END -->
 </div>
 
 ---
