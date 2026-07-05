@@ -43,14 +43,17 @@ const Pill = ({ children, tone = "indigo" }) => (
   </span>
 );
 
-const Empty = ({ icon: Icon, title, subtitle, action }) => (
-  <div className="flex flex-col items-center justify-center text-center py-16">
-    <Icon className="w-10 h-10 text-gray-400 mb-3" />
-    <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-    {subtitle && <p className="text-gray-500 mt-1 max-w-md">{subtitle}</p>}
-    {action && <div className="mt-5">{action}</div>}
-  </div>
-);
+const Empty = (props) => {
+  const { icon: Icon, title, subtitle, action } = props;
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-16">
+      <Icon className="w-10 h-10 text-gray-400 mb-3" />
+      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+      {subtitle && <p className="text-gray-500 mt-1 max-w-md">{subtitle}</p>}
+      {action && <div className="mt-5">{action}</div>}
+    </div>
+  );
+};
 
 const Policies = () => {
   const { backendUrl } = useContext(AppContent);
@@ -116,7 +119,7 @@ const Policies = () => {
       await axios.post(
         `${backendUrl}/api/policies/${policyId}/analyze`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
     } catch (e) {
       // Don’t fail the flow if analysis endpoint isn’t present.
@@ -139,7 +142,7 @@ const Policies = () => {
         {
           withCredentials: true,
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       if (res.data.success) {
@@ -147,7 +150,7 @@ const Policies = () => {
         toast.success(
           isUpdate
             ? "✅ New version uploaded successfully!"
-            : "✅ Policy uploaded successfully!"
+            : "✅ Policy uploaded successfully!",
         );
         setFile(null);
         setCommitMsg("");
@@ -168,10 +171,13 @@ const Policies = () => {
 
   const handleDownload = async (policyId, filename = "policy.pdf") => {
     try {
-      const res = await axios.get(`${backendUrl}/api/policies/download/${policyId}`, {
-        responseType: "blob",
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${backendUrl}/api/policies/download/${policyId}`,
+        {
+          responseType: "blob",
+          withCredentials: true,
+        },
+      );
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -179,7 +185,7 @@ const Policies = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (err) {
+    } catch {
       toast.error("Failed to download file.");
     }
   };
@@ -207,7 +213,7 @@ const Policies = () => {
           .filter(Boolean)
           .join(" ")
           .toLowerCase()
-          .includes(q)
+          .includes(q),
       );
     }
     list.sort((a, b) => {
@@ -228,10 +234,12 @@ const Policies = () => {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <FileText className="w-8 h-8 text-indigo-600" /> Policies Repository
+              <FileText className="w-8 h-8 text-indigo-600" /> Policies
+              Repository
             </h1>
             <p className="text-gray-600 mt-1">
-              Upload, version, compare and track policy documents with AI summaries.
+              Upload, version, compare and track policy documents with AI
+              summaries.
             </p>
           </div>
 
@@ -248,7 +256,8 @@ const Policies = () => {
         {/* Upload card */}
         <div className="bg-white shadow-sm p-6 rounded-2xl mb-8 border border-gray-100">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Upload className="w-5 h-5 text-blue-600" /> Upload New Policy Document
+            <Upload className="w-5 h-5 text-blue-600" /> Upload New Policy
+            Document
           </h2>
 
           <div className="flex flex-col md:flex-row items-center gap-4">
@@ -278,10 +287,12 @@ const Policies = () => {
           {showUpdatePrompt && existingPolicy && (
             <div className="mt-6 bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
               <h3 className="font-semibold text-yellow-800 flex items-center gap-2 mb-2">
-                <GitBranch className="w-4 h-4" /> This file already exists (v{existingPolicy.version || "1.0"}).
+                <GitBranch className="w-4 h-4" /> This file already exists (v
+                {existingPolicy.version || "1.0"}).
               </h3>
               <p className="text-sm text-yellow-700 mb-3">
-                Upload as a <b>new version</b> with a commit message, or upload as a new file (rename first).
+                Upload as a <b>new version</b> with a commit message, or upload
+                as a new file (rename first).
               </p>
 
               <input
@@ -360,7 +371,9 @@ const Policies = () => {
           </div>
 
           {loading ? (
-            <div className="p-10"><p className="text-gray-500">Loading policies…</p></div>
+            <div className="p-10">
+              <p className="text-gray-500">Loading policies…</p>
+            </div>
           ) : filtered.length === 0 ? (
             <Empty
               icon={FileText}
@@ -369,14 +382,21 @@ const Policies = () => {
               action={
                 <label className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
                   <Upload className="w-4 h-4" /> Upload
-                  <input type="file" className="hidden" onChange={handleFileChange} />
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                 </label>
               }
             />
           ) : (
             <ul className="divide-y">
               {filtered.map((p) => (
-                <li key={p._id} className="px-6 py-4 grid md:grid-cols-12 gap-4 items-start">
+                <li
+                  key={p._id}
+                  className="px-6 py-4 grid md:grid-cols-12 gap-4 items-start"
+                >
                   {/* Name & meta */}
                   <div className="md:col-span-5">
                     <div className="flex items-start gap-3">
@@ -390,15 +410,23 @@ const Policies = () => {
                             {p.name}
                           </button>
                           {p.isDraft && <Pill tone="amber">Draft</Pill>}
-                          {p.analysis?.status === "processing" && <Pill tone="blue">Analyzing…</Pill>}
+                          {p.analysis?.status === "processing" && (
+                            <Pill tone="blue">Analyzing…</Pill>
+                          )}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          Created {formatDate(p.createdAt)} · Updated {formatDate(p.updatedAt || p.createdAt)}
+                          Created {formatDate(p.createdAt)} · Updated{" "}
+                          {formatDate(p.updatedAt || p.createdAt)}
                         </div>
                         {p.keywords?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-2">
                             {p.keywords.slice(0, 6).map((tag, i) => (
-                              <span key={i} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">#{tag}</span>
+                              <span
+                                key={i}
+                                className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"
+                              >
+                                #{tag}
+                              </span>
                             ))}
                           </div>
                         )}
@@ -420,7 +448,8 @@ const Policies = () => {
                           className="text-xs text-indigo-600 hover:underline"
                           onClick={() => setShowHistoryFor(p)}
                         >
-                          <History className="w-3.5 h-3.5 inline mr-1" /> {p.previousVersions.length} prev
+                          <History className="w-3.5 h-3.5 inline mr-1" />{" "}
+                          {p.previousVersions.length} prev
                         </button>
                       )}
                     </div>
@@ -430,10 +459,16 @@ const Policies = () => {
                   <div className="md:col-span-3">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <UserCircle className="w-4 h-4 text-gray-400" />
-                      <span>{p?.uploadedBy?.name || p?.lastEditedBy?.name || "Unknown"}</span>
+                      <span>
+                        {p?.uploadedBy?.name ||
+                          p?.lastEditedBy?.name ||
+                          "Unknown"}
+                      </span>
                     </div>
                     {p?.lastEditedBy?.name && (
-                      <div className="text-xs text-gray-500">Last edited by {p.lastEditedBy.name}</div>
+                      <div className="text-xs text-gray-500">
+                        Last edited by {p.lastEditedBy.name}
+                      </div>
                     )}
                   </div>
 
@@ -487,10 +522,12 @@ const Policies = () => {
             </button>
 
             <h2 className="text-2xl font-semibold mb-2 text-gray-800 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-600" /> {selectedPolicy.name}
+              <FileText className="w-5 h-5 text-indigo-600" />{" "}
+              {selectedPolicy.name}
             </h2>
             <p className="text-sm text-gray-500 mb-4">
-              Version: {selectedPolicy.version || "1.0"} · Uploaded {formatDate(selectedPolicy.createdAt)}
+              Version: {selectedPolicy.version || "1.0"} · Uploaded{" "}
+              {formatDate(selectedPolicy.createdAt)}
             </p>
 
             <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-700 whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
@@ -501,7 +538,8 @@ const Policies = () => {
             {selectedPolicy.key_changes?.length > 0 && (
               <div className="mt-4">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-indigo-600" /> Key changes
+                  <MessageSquare className="w-4 h-4 text-indigo-600" /> Key
+                  changes
                 </h4>
                 <ul className="text-sm text-gray-700 list-disc ml-5">
                   {selectedPolicy.key_changes.map((c, i) => (
@@ -514,24 +552,33 @@ const Policies = () => {
             {selectedPolicy.previousVersions?.length > 0 && (
               <div className="mt-6 text-left">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <History className="w-4 h-4 text-indigo-600" /> Previous Versions
+                  <History className="w-4 h-4 text-indigo-600" /> Previous
+                  Versions
                 </h4>
                 <ul className="text-sm text-gray-600 list-disc ml-5">
                   {selectedPolicy.previousVersions.map((v, i) => (
-                    <li key={i} className="flex items-center justify-between gap-3">
+                    <li
+                      key={i}
+                      className="flex items-center justify-between gap-3"
+                    >
                       <span>
-                        {v.name} (v{v.version || "1.0"}) – {new Date(v.createdAt).toLocaleDateString()} {v?.uploadedBy?.name ? `· by ${v.uploadedBy.name}` : ""}
+                        {v.name} (v{v.version || "1.0"}) –{" "}
+                        {new Date(v.createdAt).toLocaleDateString()}{" "}
+                        {v?.uploadedBy?.name ? `· by ${v.uploadedBy.name}` : ""}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
                           className="text-xs text-gray-700 hover:text-blue-600"
                           onClick={() => handleDownload(v._id, v.name)}
                         >
-                          <Download className="w-3.5 h-3.5 inline mr-1" /> Download
+                          <Download className="w-3.5 h-3.5 inline mr-1" />{" "}
+                          Download
                         </button>
                         <button
                           className="text-xs text-indigo-700 hover:underline"
-                          onClick={() => setComparePair({ older: v, newer: selectedPolicy })}
+                          onClick={() =>
+                            setComparePair({ older: v, newer: selectedPolicy })
+                          }
                         >
                           Compare
                         </button>
@@ -556,29 +603,51 @@ const Policies = () => {
               ✖
             </button>
             <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-              <History className="w-5 h-5 text-purple-600" /> Version history – {showHistoryFor.name}
+              <History className="w-5 h-5 text-purple-600" /> Version history –{" "}
+              {showHistoryFor.name}
             </h3>
             <p className="text-sm text-gray-500 mb-4">
-              Current: v{showHistoryFor.version || "1.0"} · {formatDate(showHistoryFor.updatedAt || showHistoryFor.createdAt)}
+              Current: v{showHistoryFor.version || "1.0"} ·{" "}
+              {formatDate(showHistoryFor.updatedAt || showHistoryFor.createdAt)}
             </p>
 
             {showHistoryFor.previousVersions?.length ? (
               <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                 {showHistoryFor.previousVersions.map((v) => (
-                  <div key={v._id || v.createdAt} className="border rounded-xl p-4 bg-gray-50">
+                  <div
+                    key={v._id || v.createdAt}
+                    className="border rounded-xl p-4 bg-gray-50"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-700">
-                        <span className="font-medium">v{v.version || "1.0"}</span> · {formatDate(v.createdAt)} {v?.uploadedBy?.name ? `· by ${v.uploadedBy.name}` : ""}
+                        <span className="font-medium">
+                          v{v.version || "1.0"}
+                        </span>{" "}
+                        · {formatDate(v.createdAt)}{" "}
+                        {v?.uploadedBy?.name ? `· by ${v.uploadedBy.name}` : ""}
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="text-xs text-indigo-700 hover:underline" onClick={() => setComparePair({ older: v, newer: showHistoryFor })}>Compare with current</button>
-                        <button className="text-xs text-gray-700 hover:text-blue-600" onClick={() => handleDownload(v._id, v.name)}>
-                          <Download className="w-3.5 h-3.5 inline mr-1" /> Download
+                        <button
+                          className="text-xs text-indigo-700 hover:underline"
+                          onClick={() =>
+                            setComparePair({ older: v, newer: showHistoryFor })
+                          }
+                        >
+                          Compare with current
+                        </button>
+                        <button
+                          className="text-xs text-gray-700 hover:text-blue-600"
+                          onClick={() => handleDownload(v._id, v.name)}
+                        >
+                          <Download className="w-3.5 h-3.5 inline mr-1" />{" "}
+                          Download
                         </button>
                       </div>
                     </div>
                     {v.commitMsg && (
-                      <p className="text-sm text-gray-600 mt-2">Commit: {v.commitMsg}</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Commit: {v.commitMsg}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -602,28 +671,53 @@ const Policies = () => {
             </button>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold flex items-center gap-2">
-                <Columns2 className="w-5 h-5 text-indigo-600" /> Compare versions
+                <Columns2 className="w-5 h-5 text-indigo-600" /> Compare
+                versions
               </h3>
               <div className="text-sm text-gray-600">
-                Older: <Pill>{comparePair.older.version || "?"}</Pill> → Newer: <Pill>{comparePair.newer.version || "?"}</Pill>
+                Older: <Pill>{comparePair.older.version || "?"}</Pill> → Newer:{" "}
+                <Pill>{comparePair.newer.version || "?"}</Pill>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto">
               <div className="border rounded-xl p-4 bg-gray-50">
-                <h4 className="font-medium mb-1">v{comparePair.older.version || "?"} – {comparePair.older.name}</h4>
-                <p className="text-xs text-gray-500 mb-2">{formatDate(comparePair.older.createdAt)} {comparePair?.older?.uploadedBy?.name ? `· by ${comparePair.older.uploadedBy.name}` : ""}</p>
-                <pre className="text-sm text-gray-800 whitespace-pre-wrap">{comparePair.older.summary || "(No summary available)"}</pre>
+                <h4 className="font-medium mb-1">
+                  v{comparePair.older.version || "?"} – {comparePair.older.name}
+                </h4>
+                <p className="text-xs text-gray-500 mb-2">
+                  {formatDate(comparePair.older.createdAt)}{" "}
+                  {comparePair?.older?.uploadedBy?.name
+                    ? `· by ${comparePair.older.uploadedBy.name}`
+                    : ""}
+                </p>
+                <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                  {comparePair.older.summary || "(No summary available)"}
+                </pre>
               </div>
               <div className="border rounded-xl p-4 bg-gray-50">
-                <h4 className="font-medium mb-1">v{comparePair.newer.version || "?"} – {comparePair.newer.name}</h4>
-                <p className="text-xs text-gray-500 mb-2">{formatDate(comparePair.newer.updatedAt || comparePair.newer.createdAt)} {comparePair?.newer?.uploadedBy?.name ? `· by ${comparePair.newer.uploadedBy.name}` : ""}</p>
-                <pre className="text-sm text-gray-800 whitespace-pre-wrap">{comparePair.newer.summary || "(No summary available)"}</pre>
+                <h4 className="font-medium mb-1">
+                  v{comparePair.newer.version || "?"} – {comparePair.newer.name}
+                </h4>
+                <p className="text-xs text-gray-500 mb-2">
+                  {formatDate(
+                    comparePair.newer.updatedAt || comparePair.newer.createdAt,
+                  )}{" "}
+                  {comparePair?.newer?.uploadedBy?.name
+                    ? `· by ${comparePair.newer.uploadedBy.name}`
+                    : ""}
+                </p>
+                <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                  {comparePair.newer.summary || "(No summary available)"}
+                </pre>
               </div>
             </div>
 
             <div className="mt-4 text-sm text-gray-500">
-              This is a visual placeholder. Hook up a backend diff endpoint like <code>/api/policies/compare?from=[olderId]&to=[newerId]</code> and render a structured diff here (e.g., unified/inline with highlights).
+              This is a visual placeholder. Hook up a backend diff endpoint like{" "}
+              <code>/api/policies/compare?from=[olderId]&to=[newerId]</code> and
+              render a structured diff here (e.g., unified/inline with
+              highlights).
             </div>
           </div>
         </div>
@@ -644,7 +738,8 @@ const Policies = () => {
               <h3 className="text-lg font-semibold">Delete policy?</h3>
             </div>
             <p className="text-sm text-gray-600 mt-2">
-              You are about to permanently delete <b>{confirmDelete.name}</b>. This action cannot be undone.
+              You are about to permanently delete <b>{confirmDelete.name}</b>.
+              This action cannot be undone.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button

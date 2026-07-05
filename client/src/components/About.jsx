@@ -58,10 +58,7 @@ const About = () => {
   const headingRef = useIntersectionFade();
 
   return (
-    <section
-      id="about"
-      className="py-24 bg-linear-to-b from-white to-slate-50"
-    >
+    <section id="about" className="py-24 bg-linear-to-b from-white to-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
         {/* Section Header */}
         <div
@@ -120,7 +117,8 @@ const About = () => {
   );
 };
 
-const AboutCard = ({ Icon, feature, stagger }) => {
+const AboutCard = (props) => {
+  const { Icon, feature, stagger } = props;
   const ref = useRef(null);
 
   useEffect(() => {

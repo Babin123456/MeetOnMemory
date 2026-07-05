@@ -174,27 +174,43 @@ npm run dev
 
 ---
 
-# 🧹 Before You Commit
+# 🧹 Before You Commit & CI/CD Pipeline
 
-Format your code:
+To ensure code quality and avoid PR checklist failures, we run quality checks on every Pull Request via **GitHub Actions**.
 
-```bash
-npx prettier --write .
-```
+### ⚙️ CI/CD Pipeline Checks
+Every Pull Request runs the following status checks:
+- **CI Pipeline / Format**: Verifies file formatting using `npm run format:check`.
+- **CI Pipeline / Lint**: Runs static analysis check via `npm run lint`.
+- **CI Pipeline / Prettier Check**: Checks formatting using Prettier via `npx prettier . --check`.
+- **CI Pipeline / Production Build**: Compiles frontend assets for production using `npm run build`.
+- **CodeQL Security Analysis**: Scans the codebase for security vulnerabilities.
 
-Build the frontend to verify there are no production build errors:
+### 💻 Running Checks Locally
+You can run the same checks locally from the repository root:
 
-```bash
-cd client
+1. **Verify Formatting**:
+   ```bash
+   npm run format:check
+   ```
+   To automatically format files:
+   ```bash
+   npm run format
+   ```
 
-npm run build
-```
+2. **Run Lint Checks**:
+   ```bash
+   npm run lint
+   ```
+
+3. **Verify Production Build**:
+   ```bash
+   npm run build
+   ```
 
 If your changes affect the backend, make sure it starts correctly:
-
 ```bash
-cd ../server
-
+cd server
 npm run server
 ```
 
@@ -266,7 +282,8 @@ Before opening a Pull Request, ensure:
 - [ ] Related Issue is linked.
 - [ ] Issue was assigned before starting work.
 - [ ] Project builds successfully (`npm run build`).
-- [ ] Code is formatted (`npx prettier --write .`).
+- [ ] Code is formatted (`npm run format`).
+- [ ] Code passes lint checks (`npm run lint`).
 - [ ] Documentation updated (if needed).
 - [ ] No unnecessary files included.
 - [ ] No merge conflicts.

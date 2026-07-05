@@ -58,6 +58,30 @@ jobs:
               const UNCLAIM_COMMAND = "/unclaim";
 
               const BOT_MESSAGES = {
+                invalidClaim: (user) =>
+                  `👋 Thanks for your interest, @${user}!\n\n` +
+                  `To claim this issue, please comment:\n\n` +
+                  `\`${CLAIM_COMMAND}\`\n\n` +
+                  `Only the first valid \`${CLAIM_COMMAND}\` comment is eligible for automatic assignment.`,
+
+                assigned: (user) =>
+                  `🎉 Issue Assigned\n\n` +
+                  `Welcome @${user}!\n\n` +
+                  `This issue has been assigned to you following our first-come, first-served policy.\n\n` +
+                  `Please submit a Pull Request within 24 hours.\n\n` +
+                  `If you need more time, please update the issue before the deadline.\n\n` +
+                  `Happy coding! 🚀`,
+
+                alreadyAssigned: (user) =>
+                  `⚠️ This issue is currently assigned to @${user}.\n\n` +
+                  `If the issue becomes available again, feel free to claim it.`,
+
+                claimRejected: (author) =>
+                  `❌ This issue was opened by another contributor.\n\n` +
+                  `Only the issue author (@${author}) may claim this issue automatically.\n\n` +
+                  `Repository maintainers may still assign contributors manually if required.`,
+                alreadyClaimed: (user) => `⚠️ @${user}, you are already assigned to this issue!`,
+                closedIssue: (user) => `❌ Request denied. You cannot claim a closed issue, @${user}.`
                 invalidClaim: (user) => `👋 Thanks for your interest, @${user}!
 
 To claim this issue, please comment:
@@ -137,6 +161,7 @@ Repository maintainers may still assign contributors manually if required.`,
                 commentBody !== CLAIM_COMMAND &&
                 commentBody !== UNCLAIM_COMMAND &&
                 invalidClaimMessages.includes(commentBody.toLowerCase())
+              ){
               ) {
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,

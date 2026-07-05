@@ -17,7 +17,7 @@ const JoinOrganizationPage = () => {
       try {
         const { data } = await axios.get(`${backendUrl}/api/organizations`);
         if (data.success) setOrgList(data.organizations);
-      } catch (err) {
+      } catch {
         toast.error("Failed to load organizations");
       } finally {
         setLoading(false);
@@ -28,9 +28,12 @@ const JoinOrganizationPage = () => {
 
   const handleJoin = async (orgId) => {
     try {
-      const { data } = await axios.post(`${backendUrl}/api/organizations/join`, {
-        organizationId: orgId,
-      });
+      const { data } = await axios.post(
+        `${backendUrl}/api/organizations/join`,
+        {
+          organizationId: orgId,
+        },
+      );
 
       if (data.success) {
         toast.success("Joined organization successfully!");
@@ -39,7 +42,7 @@ const JoinOrganizationPage = () => {
       } else {
         toast.error(data.message);
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to join organization");
     }
   };

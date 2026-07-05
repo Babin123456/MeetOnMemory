@@ -26,7 +26,7 @@ import {
   Sparkles,
   Tag,
   ExternalLink,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 
 const CreateMeeting = () => {
@@ -53,9 +53,11 @@ const CreateMeeting = () => {
 
   // ========== SECTION 2: LIVE MEETING ==========
   const [liveParticipants, setLiveParticipants] = useState([]);
-  const [newLiveParticipant, setNewLiveParticipant] = useState({ name: "", email: "" });
+  const [newLiveParticipant, setNewLiveParticipant] = useState({
+    name: "",
+    email: "",
+  });
   const [showRecordingDialog, setShowRecordingDialog] = useState(false);
-  const [recordingConsent, setRecordingConsent] = useState(null);
 
   // ========== SECTION 3: SESSION CARDS (CONFERENCE/SEMINAR) ==========
   const [sessionData, setSessionData] = useState({
@@ -134,12 +136,12 @@ const CreateMeeting = () => {
       const response = await axios.post(
         `${backendUrl}/api/meetings/schedule`,
         payload,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.data?.success) {
         toast.success("✅ Meeting scheduled and synced to calendars!");
-        
+
         // Trigger calendar integration
         if (response.data.calendarLinks) {
           toast.info("📅 Calendar invites sent to all participants!");
@@ -164,7 +166,9 @@ const CreateMeeting = () => {
       }
     } catch (error) {
       console.error("Error scheduling meeting:", error);
-      toast.error(error.response?.data?.message || "Unable to schedule meeting");
+      toast.error(
+        error.response?.data?.message || "Unable to schedule meeting",
+      );
     } finally {
       setLoading(false);
     }
@@ -173,7 +177,10 @@ const CreateMeeting = () => {
   // ========== HANDLERS: SECTION 2 - LIVE MEETING ==========
   const addLiveParticipant = () => {
     if (newLiveParticipant.name.trim() && newLiveParticipant.email.trim()) {
-      setLiveParticipants([...liveParticipants, { ...newLiveParticipant, id: Date.now() }]);
+      setLiveParticipants([
+        ...liveParticipants,
+        { ...newLiveParticipant, id: Date.now() },
+      ]);
       setNewLiveParticipant({ name: "", email: "" });
       toast.success("Participant added");
     } else {
@@ -194,19 +201,20 @@ const CreateMeeting = () => {
   };
 
   const handleRecordingChoice = (willRecord) => {
-    setRecordingConsent(willRecord);
     setShowRecordingDialog(false);
 
-    const recordingStatus = willRecord ? "with recording enabled" : "without recording";
+    const recordingStatus = willRecord
+      ? "with recording enabled"
+      : "without recording";
     toast.success(`🎥 Starting live meeting ${recordingStatus}...`);
 
     // Redirect to meeting room with parameters
     setTimeout(() => {
       window.open(
         `/meeting-room?recording=${willRecord}&participants=${encodeURIComponent(JSON.stringify(liveParticipants))}`,
-        '_blank'
+        "_blank",
       );
-      
+
       // Reset participants after redirect
       setLiveParticipants([]);
     }, 500);
@@ -266,7 +274,7 @@ const CreateMeeting = () => {
         {
           headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
-        }
+        },
       );
 
       if (response.data?.success) {
@@ -305,7 +313,8 @@ const CreateMeeting = () => {
             📝 Meeting & Event Hub
           </h1>
           <p className="text-gray-600 max-w-3xl mx-auto">
-            Schedule meetings with calendar integration, start live meetings with AI transcription, or create session cards for conferences.
+            Schedule meetings with calendar integration, start live meetings
+            with AI transcription, or create session cards for conferences.
           </p>
         </div>
 
@@ -313,28 +322,31 @@ const CreateMeeting = () => {
         <div className="flex flex-wrap gap-3 mb-8 justify-center">
           <button
             onClick={() => setActiveSection("schedule")}
-            className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${activeSection === "schedule"
+            className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+              activeSection === "schedule"
                 ? "bg-blue-600 text-white shadow-lg"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-              }`}
+            }`}
           >
             <Calendar size={20} /> Schedule Meeting
           </button>
           <button
             onClick={() => setActiveSection("live")}
-            className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${activeSection === "live"
+            className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+              activeSection === "live"
                 ? "bg-indigo-600 text-white shadow-lg"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-              }`}
+            }`}
           >
             <Video size={20} /> Live Meeting
           </button>
           <button
             onClick={() => setActiveSection("session")}
-            className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${activeSection === "session"
+            className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+              activeSection === "session"
                 ? "bg-purple-600 text-white shadow-lg"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-              }`}
+            }`}
           >
             <Presentation size={20} /> Session Cards
           </button>
@@ -346,25 +358,35 @@ const CreateMeeting = () => {
             <div className="flex items-center gap-3 mb-6">
               <Calendar className="text-blue-600" size={28} />
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Schedule Meeting</h2>
-                <p className="text-sm text-gray-600">Create and manage meeting schedules with automatic calendar integration</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Schedule Meeting
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Create and manage meeting schedules with automatic calendar
+                  integration
+                </p>
               </div>
             </div>
 
             <form onSubmit={handleScheduleSubmit}>
               {/* Meeting Type */}
               <div className="mb-6">
-                <label className="block mb-3 font-semibold text-gray-700">Meeting Type</label>
+                <label className="block mb-3 font-semibold text-gray-700">
+                  Meeting Type
+                </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {["conference", "policy", "event", "internal"].map((type) => (
                     <button
                       key={type}
                       type="button"
-                      onClick={() => setScheduleData({ ...scheduleData, meetingType: type })}
-                      className={`px-4 py-2 rounded-lg border-2 transition capitalize ${scheduleData.meetingType === type
+                      onClick={() =>
+                        setScheduleData({ ...scheduleData, meetingType: type })
+                      }
+                      className={`px-4 py-2 rounded-lg border-2 transition capitalize ${
+                        scheduleData.meetingType === type
                           ? "border-blue-600 bg-blue-50 text-blue-700"
                           : "border-gray-200 hover:border-gray-300"
-                        }`}
+                      }`}
                     >
                       {type}
                     </button>
@@ -374,7 +396,9 @@ const CreateMeeting = () => {
 
               {/* Title & Description */}
               <div className="mb-6">
-                <label className="block mb-2 font-semibold text-gray-700">Meeting Title *</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Meeting Title *
+                </label>
                 <input
                   type="text"
                   name="title"
@@ -387,7 +411,9 @@ const CreateMeeting = () => {
               </div>
 
               <div className="mb-6">
-                <label className="block mb-2 font-semibold text-gray-700">Description & Objective</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Description & Objective
+                </label>
                 <textarea
                   name="description"
                   value={scheduleData.description}
@@ -401,7 +427,9 @@ const CreateMeeting = () => {
               {/* Date & Time */}
               <div className="grid md:grid-cols-3 gap-4 mb-6">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Date *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Date *
+                  </label>
                   <input
                     type="date"
                     name="date"
@@ -412,7 +440,9 @@ const CreateMeeting = () => {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Time *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Time *
+                  </label>
                   <input
                     type="time"
                     name="time"
@@ -423,7 +453,9 @@ const CreateMeeting = () => {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Duration (min)</label>
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Duration (min)
+                  </label>
                   <input
                     type="number"
                     name="duration"
@@ -438,7 +470,9 @@ const CreateMeeting = () => {
               {/* Location */}
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Location/Platform</label>
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Location/Platform
+                  </label>
                   <input
                     type="text"
                     name="location"
@@ -449,7 +483,9 @@ const CreateMeeting = () => {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Venue Details</label>
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Venue Details
+                  </label>
                   <input
                     type="text"
                     name="venue"
@@ -470,14 +506,24 @@ const CreateMeeting = () => {
                   <input
                     type="text"
                     value={newParticipant.name}
-                    onChange={(e) => setNewParticipant({ ...newParticipant, name: e.target.value })}
+                    onChange={(e) =>
+                      setNewParticipant({
+                        ...newParticipant,
+                        name: e.target.value,
+                      })
+                    }
                     placeholder="Full Name"
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
                   />
                   <input
                     type="email"
                     value={newParticipant.email}
-                    onChange={(e) => setNewParticipant({ ...newParticipant, email: e.target.value })}
+                    onChange={(e) =>
+                      setNewParticipant({
+                        ...newParticipant,
+                        email: e.target.value,
+                      })
+                    }
                     placeholder="Email Address"
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
                   />
@@ -493,7 +539,10 @@ const CreateMeeting = () => {
                 {participants.length > 0 && (
                   <div className="mt-4 space-y-2">
                     {participants.map((p) => (
-                      <div key={p.id} className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg">
+                      <div
+                        key={p.id}
+                        className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg"
+                      >
                         <span className="text-sm">
                           <strong>{p.name}</strong> - {p.email}
                         </span>
@@ -512,13 +561,17 @@ const CreateMeeting = () => {
 
               {/* Agenda */}
               <div className="mb-6">
-                <label className="block mb-3 font-semibold text-gray-700">Meeting Agenda</label>
+                <label className="block mb-3 font-semibold text-gray-700">
+                  Meeting Agenda
+                </label>
                 <div className="flex gap-3 mb-3">
                   <input
                     type="text"
                     value={newAgenda}
                     onChange={(e) => setNewAgenda(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addAgendaItem())}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && (e.preventDefault(), addAgendaItem())
+                    }
                     placeholder="Add agenda item..."
                     className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
                   />
@@ -534,7 +587,10 @@ const CreateMeeting = () => {
                 {agendaItems.length > 0 && (
                   <ul className="space-y-2">
                     {agendaItems.map((item, index) => (
-                      <li key={item.id} className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg">
+                      <li
+                        key={item.id}
+                        className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg"
+                      >
                         <span className="text-sm">
                           {index + 1}. {item.text}
                         </span>
@@ -565,7 +621,10 @@ const CreateMeeting = () => {
                 {attachments.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {attachments.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg"
+                      >
                         <span className="text-sm">{file.name}</span>
                         <button
                           type="button"
@@ -582,9 +641,14 @@ const CreateMeeting = () => {
 
               {/* Calendar Integration Notice */}
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-                <CheckCircle className="text-green-600 flex-shrink-0" size={20} />
+                <CheckCircle
+                  className="text-green-600 flex-shrink-0"
+                  size={20}
+                />
                 <div className="text-sm text-gray-700">
-                  <strong>Auto Calendar Sync:</strong> This meeting will be automatically added to Google Calendar, Outlook, and participant calendars with email invites.
+                  <strong>Auto Calendar Sync:</strong> This meeting will be
+                  automatically added to Google Calendar, Outlook, and
+                  participant calendars with email invites.
                 </div>
               </div>
 
@@ -615,8 +679,13 @@ const CreateMeeting = () => {
             <div className="flex items-center gap-3 mb-6">
               <Video className="text-indigo-600" size={28} />
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Start Live Meeting</h2>
-                <p className="text-sm text-gray-600">Add participants and start a live meeting with optional AI transcription</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Start Live Meeting
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Add participants and start a live meeting with optional AI
+                  transcription
+                </p>
               </div>
             </div>
 
@@ -629,14 +698,24 @@ const CreateMeeting = () => {
                 <input
                   type="text"
                   value={newLiveParticipant.name}
-                  onChange={(e) => setNewLiveParticipant({ ...newLiveParticipant, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewLiveParticipant({
+                      ...newLiveParticipant,
+                      name: e.target.value,
+                    })
+                  }
                   placeholder="Full Name"
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
                 />
                 <input
                   type="email"
                   value={newLiveParticipant.email}
-                  onChange={(e) => setNewLiveParticipant({ ...newLiveParticipant, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewLiveParticipant({
+                      ...newLiveParticipant,
+                      email: e.target.value,
+                    })
+                  }
                   placeholder="Email Address"
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
                 />
@@ -652,7 +731,10 @@ const CreateMeeting = () => {
               {liveParticipants.length > 0 && (
                 <div className="mt-4 space-y-2">
                   {liveParticipants.map((p) => (
-                    <div key={p.id} className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg">
+                    <div
+                      key={p.id}
+                      className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg"
+                    >
                       <span className="text-sm">
                         <strong>{p.name}</strong> - {p.email}
                       </span>
@@ -680,8 +762,14 @@ const CreateMeeting = () => {
                     Live AI Meeting Connect
                   </h3>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    🔴 Experience <strong>real-time video conferencing</strong> integrated with
-                    <strong> AI-powered transcription and live summarization</strong>. Your meeting notes will be generated instantly with smart highlights.
+                    🔴 Experience <strong>real-time video conferencing</strong>{" "}
+                    integrated with
+                    <strong>
+                      {" "}
+                      AI-powered transcription and live summarization
+                    </strong>
+                    . Your meeting notes will be generated instantly with smart
+                    highlights.
                   </p>
 
                   <ul className="text-sm text-gray-600 mb-4 space-y-1">
@@ -707,16 +795,13 @@ const CreateMeeting = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => {
-                if (liveParticipants.length === 0) {
-                  e.preventDefault();
-                  toast.warning("Add at least one participant before starting the meeting");
-                } else {
-                  setShowRecordingDialog(true);
-                  e.preventDefault();
-                }
+                e.preventDefault();
+                handleStartLiveMeeting();
               }}
               className={`w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-md hover:shadow-xl ${
-                liveParticipants.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+                liveParticipants.length === 0
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
             >
               <Video size={18} /> 🚀 Start Live Meeting
@@ -731,9 +816,13 @@ const CreateMeeting = () => {
             <div className="flex items-center gap-3 mb-6">
               <Presentation className="text-purple-600" size={28} />
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Auto Session Card Generation</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Auto Session Card Generation
+                </h2>
                 <p className="text-sm text-gray-600">
-                  Upload slides/videos from conferences and seminars - AI generates session cards with summaries, keywords, and speaker profiles
+                  Upload slides/videos from conferences and seminars - AI
+                  generates session cards with summaries, keywords, and speaker
+                  profiles
                 </p>
               </div>
             </div>
@@ -741,7 +830,9 @@ const CreateMeeting = () => {
             <form onSubmit={handleSessionSubmit}>
               {/* Event & Session Info */}
               <div className="mb-6">
-                <label className="block mb-2 font-semibold text-gray-700">Event Name</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Event Name
+                </label>
                 <input
                   type="text"
                   name="eventName"
@@ -753,7 +844,9 @@ const CreateMeeting = () => {
               </div>
 
               <div className="mb-6">
-                <label className="block mb-2 font-semibold text-gray-700">Session Title *</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Session Title *
+                </label>
                 <input
                   type="text"
                   name="sessionTitle"
@@ -768,11 +861,14 @@ const CreateMeeting = () => {
               {/* Speaker Information */}
               <div className="mb-6 p-6 bg-purple-50 border border-purple-200 rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Users size={20} className="text-purple-600" /> Speaker Profile
+                  <Users size={20} className="text-purple-600" /> Speaker
+                  Profile
                 </h3>
 
                 <div className="mb-4">
-                  <label className="block mb-2 font-medium text-gray-700">Speaker Name</label>
+                  <label className="block mb-2 font-medium text-gray-700">
+                    Speaker Name
+                  </label>
                   <input
                     type="text"
                     name="speaker"
@@ -784,7 +880,9 @@ const CreateMeeting = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block mb-2 font-medium text-gray-700">Speaker Title/Position</label>
+                  <label className="block mb-2 font-medium text-gray-700">
+                    Speaker Title/Position
+                  </label>
                   <input
                     type="text"
                     name="speakerTitle"
@@ -796,7 +894,9 @@ const CreateMeeting = () => {
                 </div>
 
                 <div>
-                  <label className="block mb-2 font-medium text-gray-700">Speaker Bio</label>
+                  <label className="block mb-2 font-medium text-gray-700">
+                    Speaker Bio
+                  </label>
                   <textarea
                     name="speakerBio"
                     value={sessionData.speakerBio}
@@ -823,7 +923,10 @@ const CreateMeeting = () => {
                 {slideFiles.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {slideFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg"
+                      >
                         <span className="text-sm flex items-center gap-2">
                           <FileText size={16} className="text-purple-600" />
                           {file.name}
@@ -840,7 +943,8 @@ const CreateMeeting = () => {
                   </div>
                 )}
                 <p className="mt-2 text-xs text-gray-500">
-                  AI will extract text from slides and generate summary with keywords
+                  AI will extract text from slides and generate summary with
+                  keywords
                 </p>
               </div>
 
@@ -887,14 +991,23 @@ const CreateMeeting = () => {
             {/* Display Generated Sessions */}
             {generatedSessions.length > 0 && (
               <div className="mt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">✨ Generated Session Cards</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  ✨ Generated Session Cards
+                </h3>
                 <div className="space-y-4">
                   {generatedSessions.map((session, index) => (
-                    <div key={index} className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-6">
+                    <div
+                      key={index}
+                      className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-6"
+                    >
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h4 className="text-lg font-bold text-gray-900">{session.sessionTitle}</h4>
-                          <p className="text-sm text-gray-600">{session.eventName}</p>
+                          <h4 className="text-lg font-bold text-gray-900">
+                            {session.sessionTitle}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {session.eventName}
+                          </p>
                         </div>
                         <span className="px-3 py-1 bg-purple-600 text-white text-xs rounded-full">
                           Session
@@ -903,21 +1016,29 @@ const CreateMeeting = () => {
 
                       {session.speaker && (
                         <div className="mb-3 p-3 bg-white rounded-lg">
-                          <p className="text-sm font-semibold text-gray-900">{session.speaker}</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {session.speaker}
+                          </p>
                           {session.speakerTitle && (
-                            <p className="text-xs text-gray-600">{session.speakerTitle}</p>
+                            <p className="text-xs text-gray-600">
+                              {session.speakerTitle}
+                            </p>
                           )}
                         </div>
                       )}
 
                       <p className="text-sm text-gray-700 mb-3">
-                        {session.summary || "AI-generated summary will appear here..."}
+                        {session.summary ||
+                          "AI-generated summary will appear here..."}
                       </p>
 
                       {session.keywords && session.keywords.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {session.keywords.map((keyword, i) => (
-                            <span key={i} className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full flex items-center gap-1">
+                            <span
+                              key={i}
+                              className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full flex items-center gap-1"
+                            >
                               <Tag size={12} /> {keyword}
                             </span>
                           ))}
@@ -952,17 +1073,22 @@ const CreateMeeting = () => {
                 <Video className="text-indigo-600" size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Recording Permission</h3>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Recording Permission
+                </h3>
                 <p className="text-sm text-gray-600">Choose recording option</p>
               </div>
             </div>
 
             <div className="mb-6">
               <p className="text-gray-700 mb-4">
-                Do you want to record this meeting for AI transcription and summarization?
+                Do you want to record this meeting for AI transcription and
+                summarization?
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-gray-700">
-                <strong>With Recording:</strong> AI will transcribe the meeting in real-time and generate a summary with action items after the meeting ends.
+                <strong>With Recording:</strong> AI will transcribe the meeting
+                in real-time and generate a summary with action items after the
+                meeting ends.
               </div>
             </div>
 

@@ -2,7 +2,7 @@ name: Claim Expiration Monitor
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
 
 permissions:
   issues: write
@@ -79,8 +79,7 @@ jobs:
                 // 3. Match text verification cleanly to prevent hourly duplication
                 const alreadyWarned = comments.data.some(
                    c => c.body.includes("your claim has been inactive for 24 hours")
-                
-);
+                );
                 if (!alreadyWarned) {
                   await github.rest.issues.createComment({
                     owner,
