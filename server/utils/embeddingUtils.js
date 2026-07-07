@@ -72,7 +72,6 @@ export const embedText = async (text) => {
   }
 };
 
-
 // ===================================================
 // 💾 4️⃣ Index Meeting in Pinecone (FINAL v3-compatible)
 // ===================================================
@@ -126,14 +125,13 @@ export const indexMeeting = async (meeting) => {
   }
 };
 
-
 // ===================================================
 // 🔍 5️⃣ Perform Semantic Search via Pinecone
 // ===================================================
 // ===================================================
 // 🔍 5️⃣ Perform Semantic Search via Pinecone (FIXED)
 // ===================================================
-export const searchVectorStore = async (query) => {
+export const searchVectorStore = async (query, filters = {}) => {
   try {
     if (!query || query.trim().length === 0) {
       throw new Error("Empty query received for vector search");
@@ -141,13 +139,20 @@ export const searchVectorStore = async (query) => {
 
     const indexInstance = await initVectorStore();
 
-    console.log("🔍 Performing Pinecone vector search for:", query);
+    console.log(
+      "🔍 Performing Pinecone vector search for:",
+      query,
+      "with filters:",
+      filters,
+    );
 
     const queryEmbedding = await embedText(query);
 
+    const topK = filters.limit || 10;
+
     const results = await indexInstance.query({
       vector: queryEmbedding,
-      topK: 5,
+      topK: topK,
       includeMetadata: true,
     });
 
@@ -156,22 +161,63 @@ export const searchVectorStore = async (query) => {
       return [];
     }
 
-    // ✅ FIXED: Added transcript + better formatting
+    // ✅ FIXED: Added transcript + better formatting + result type
     const formattedResults = results.matches.map((match) => {
       const metadata = match.metadata || {};
-      
+
       return {
         meetingId: metadata.meetingId || match.id,
         title: metadata.title || "Untitled Meeting",
         summary: metadata.summary || "No summary available.",
-        transcript: metadata.transcript || "", // ✅ Added transcript
+        transcript: metadata.transcript || "",
         createdAt: metadata.createdAt || null,
         similarityScore: parseFloat(match.score?.toFixed(3)) || 0,
+        resultType: metadata.resultType || "meeting",
+        organization: metadata.organization || null,
+        tags: metadata.tags || [],
       };
     });
 
-    console.log("✅ Pinecone vector search results:", formattedResults);
-    return formattedResults;
+    // Apply filters if provided
+    let filteredResults = formattedResults;
+
+    if (filters.resultType && filters.resultType !== "all") {
+      filteredResults = filteredResults.filter(
+        (r) => r.resultType === filters.resultType,
+      );
+    }
+
+    if (filters.organization) {
+      filteredResults = filteredResults.filter(
+        (r) => r.organization === filters.organization,
+      );
+    }
+
+    if (filters.dateFrom) {
+      filteredResults = filteredResults.filter((r) => {
+        if (!r.createdAt) return false;
+        return new Date(r.createdAt) >= new Date(filters.dateFrom);
+      });
+    }
+
+    if (filters.dateTo) {
+      filteredResults = filteredResults.filter((r) => {
+        if (!r.createdAt) return false;
+        return new Date(r.createdAt) <= new Date(filters.dateTo);
+      });
+    }
+
+    if (filters.tags && filters.tags.length > 0) {
+      filteredResults = filteredResults.filter(
+        (r) => r.tags && r.tags.some((tag) => filters.tags.includes(tag)),
+      );
+    }
+
+    // Sort by similarity score (already ranked by Pinecone, but ensure consistency)
+    filteredResults.sort((a, b) => b.similarityScore - a.similarityScore);
+
+    console.log("✅ Pinecone vector search results:", filteredResults);
+    return filteredResults;
   } catch (error) {
     console.error("❌ Pinecone vector search error:", error);
     throw new Error("Vector search failed");
@@ -189,7 +235,9 @@ export const reindexAllMeetings = async () => {
       transcript: { $exists: true, $ne: "" },
     });
 
-    console.log(`🔁 Reindexing ${allMeetings.length} meetings into Pinecone...`);
+    console.log(
+      `🔁 Reindexing ${allMeetings.length} meetings into Pinecone...`,
+    );
     for (const m of allMeetings) {
       await indexMeeting(m);
     }
