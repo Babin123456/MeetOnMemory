@@ -29,7 +29,7 @@ router.post("/logout", logout);
 router.post("/send-verify-otp", userAuth, otpLimiter, sendVerifyOtp);
 router.post("/verify-email", userAuth, otpLimiter, verifyEmail);
 router.post("/send-reset-otp", otpLimiter, sendResetOtp);
-router.post("/reset-password", resetPassword);
+router.post("/reset-password", otpLimiter, resetPassword);
 
 // ✅ Dashboard & auth status
 router.get("/user-data", userAuth, getUserData);
