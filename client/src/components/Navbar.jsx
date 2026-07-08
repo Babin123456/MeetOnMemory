@@ -19,6 +19,7 @@ import {
   ChevronDown,
   Sparkles,
   Users,
+  CheckSquare,
 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -232,6 +233,7 @@ const Navbar = () => {
   const appLinks = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Meetings", href: "/meetings", icon: Calendar },
+    { label: "Tasks", href: "/tasks", icon: CheckSquare },
     { label: "Calendar", href: "/calendar", icon: CalendarDays },
     { label: "Team Members", href: "/team-members", icon: Users },
     { label: "Organizations", href: "/select-role", icon: Building2 },
