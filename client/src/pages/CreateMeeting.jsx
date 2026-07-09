@@ -208,14 +208,19 @@ const CreateMeeting = () => {
       : "without recording";
     toast.success(`🎥 Starting live meeting ${recordingStatus}...`);
 
-    const roomId = Math.random().toString(36).substring(2, 10) + "-" + Math.random().toString(36).substring(2, 6);
+    const roomId =
+      Math.random().toString(36).substring(2, 10) +
+      "-" +
+      Math.random().toString(36).substring(2, 6);
 
     // Redirect to meeting room with parameters
     setTimeout(() => {
-      window.open(
-        `/meeting-room/${roomId}`,
-        "_blank",
-      );
+      const queryParams = new URLSearchParams({
+        recording: willRecord.toString(),
+        participants: JSON.stringify(liveParticipants),
+      }).toString();
+
+      window.open(`/meeting-room/${roomId}?${queryParams}`, "_blank");
 
       // Reset participants after redirect
       setLiveParticipants([]);
