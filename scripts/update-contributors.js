@@ -1,74 +1,163 @@
-import { readFile, writeFile } from "fs/promises";
-const repository = process.env.GITHUB_REPOSITORY;
-if (!repository) {
-  throw new Error("GITHUB_REPOSITORY environment variable is missing.");
-}
-const [owner, repo] = repository.split("/");
+import { readFile, writeFile } from "node:fs/promises";
+import {
+  collectContributorStats,
+  fetchAllRepoContributors,
+  mergeHistoricalContributors,
+} from "./contributors/github-api.js";
+import { collectContributorStatsFromGit } from "./contributors/git-fallback.js";
+import { rankContributors } from "./contributors/ranking.js";
+import {
+  generateContributorsBlock,
+  replaceContributorsBlock,
+} from "./contributors/readme-generator.js";
+import { formatError, parseRepository } from "./contributors/utils.js";
 
-async function fetchContributors() {
-  const PER_PAGE = 100;
-  const headers = {
-    Accept: "application/vnd.github+json",
-  };
+const README_PATH = process.env.README_PATH || "README.md";
 
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+// Default repository for local execution
+const DEFAULT_REPOSITORY = "imuniqueshiv/MeetOnMemory";
+
+/**
+ * Resolve repository from:
+ * 1. GitHub Actions (GITHUB_REPOSITORY)
+ * 2. CLI (--repo owner/repo)
+ * 3. Local fallback
+ */
+function resolveRepository() {
+  const repoArgIndex = process.argv.indexOf("--repo");
+
+  if (
+    repoArgIndex !== -1 &&
+    process.argv.length > repoArgIndex + 1
+  ) {
+    return process.argv[repoArgIndex + 1];
   }
-  let page = 1;
-  const contributors = [];
-  while (true) {
-    const url = `https://api.github.com/repos/${owner}/${repo}/contributors?per_page=${PER_PAGE}&page=${page}`;
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch contributors: ${response.status} ${response.statusText}`,
+
+  if (process.env.GITHUB_REPOSITORY) {
+    return process.env.GITHUB_REPOSITORY;
+  }
+
+  console.warn(
+    `⚠️ GITHUB_REPOSITORY not found. Falling back to "${DEFAULT_REPOSITORY}".`,
+  );
+
+  return DEFAULT_REPOSITORY;
+}
+
+/**
+ * Main
+ */
+async function main() {
+  const repository = resolveRepository();
+
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
+
+  if (!token) {
+    console.warn(
+      "⚠️ No GitHub token detected. API requests may be rate-limited. Falling back to git history if necessary.",
+    );
+  }
+
+  const { owner, repo } = parseRepository(repository);
+
+  let contributorMap = {};
+
+  try {
+    contributorMap = await collectContributorStats(
+      owner,
+      repo,
+      token,
+    );
+
+    try {
+      const historical =
+        await fetchAllRepoContributors(
+          owner,
+          repo,
+          token,
+        );
+
+      contributorMap = mergeHistoricalContributors(
+        contributorMap,
+        historical,
+      );
+    } catch (historicalError) {
+      console.warn(
+        `Historical contributor merge skipped: ${formatError(
+          historicalError,
+        )}`,
       );
     }
-    const data = await response.json();
-    contributors.push(...data);
-    if (data.length < PER_PAGE) break;
-    page++;
+  } catch (apiError) {
+    console.warn(
+      `GitHub API unavailable: ${formatError(apiError)}`
+    );
+
+    console.warn(
+      "Using git history fallback..."
+    );
+
+    contributorMap =
+      await collectContributorStatsFromGit(
+        owner,
+        repo,
+      );
   }
-  return contributors.filter((contributor) => contributor.type === "User");
-}
 
-function generateContributorHtml(contributors) {
-  let html = "";
-  for (const contributor of contributors) {
-    html += `<a href="${contributor.html_url}">
-            <img src="${contributor.avatar_url}" width="75" alt="${contributor.login}"/>
-        </a>`;
+  const ranked = rankContributors(contributorMap);
+
+  if (ranked.length === 0) {
+    console.log(
+      "No human contributors found. README unchanged.",
+    );
+    return;
   }
-  return html;
-}
 
-async function updateReadme(html) {
-  const readme = await readFile("README.md", "utf8");
-  const START = "<!-- CONTRIBUTORS:START -->";
-  const END = "<!-- CONTRIBUTORS:END -->";
+  const contributorsBlock =
+    generateContributorsBlock(ranked);
 
-  const startIndex = readme.indexOf(START);
-  const endIndex = readme.indexOf(END);
-
-  if (startIndex === -1 || endIndex === -1) {
-    throw new Error("Contributor markers not found in README.");
-  }
+  const readme = await readFile(
+    README_PATH,
+    "utf8",
+  );
 
   const updatedReadme =
-    readme.slice(0, startIndex + START.length) +
-    "\n\n" +
-    html +
-    "\n\n" +
-    readme.slice(endIndex);
+    replaceContributorsBlock(
+      readme,
+      contributorsBlock,
+    );
 
-  await writeFile("README.md", updatedReadme, "utf8");
+  if (updatedReadme === readme) {
+    console.log(
+      "Contributor section already up to date.",
+    );
+    return;
+  }
+
+  await writeFile(
+    README_PATH,
+    updatedReadme,
+    "utf8",
+  );
+
+  console.log("");
+  console.log("✅ Contributor gallery updated.");
+  console.log(`Repository : ${repository}`);
+  console.log(`Contributors : ${ranked.length}`);
+  console.log(
+    `Hall of Fame : ${Math.min(
+      5,
+      ranked.length,
+    )}`,
+  );
 }
 
-async function main() {
-  const contributors = await fetchContributors();
-  const html = generateContributorHtml(contributors);
-  await updateReadme(html);
-  console.log("README.md updated successfully.");
-}
+main().catch((error) => {
+  console.error(
+    `Contributor gallery update failed: ${formatError(
+      error,
+    )}`,
+  );
 
-await main();
+  process.exit(1);
+});
