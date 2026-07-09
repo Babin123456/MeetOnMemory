@@ -1,0 +1,26 @@
+/** @typedef {{ login: string, avatarUrl: string, profileUrl: string, mergedPrs: number, mergedCommits: number, firstMergedAt: string | null }} ContributorStats */
+
+export const MARKERS = Object.freeze({
+  start: "<!-- CONTRIBUTORS:START -->",
+  end: "<!-- CONTRIBUTORS:END -->",
+});
+
+export const IGNORED_ACCOUNTS = Object.freeze([
+  "github-actions[bot]",
+  "dependabot[bot]",
+  "renovate[bot]",
+  "codecov[bot]",
+  "codecov-commenter",
+  "renovate-bot",
+]);
+
+export const RANK_BADGES = Object.freeze(["🥇", "🥈", "🥉", "4", "5"]);
+
+export const HALL_OF_FAME_SIZE = 5;
+
+export const API = Object.freeze({
+  perPage: 100,
+  maxRetries: 3,
+  retryDelayMs: 1500,
+  graphqlBatchSize: 50,
+});

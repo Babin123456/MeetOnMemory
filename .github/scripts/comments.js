@@ -1,84 +1,154 @@
 import { AUTOMATION, COMMANDS } from "./constants.js";
+
 import { withMarker } from "./utils.js";
 
 export const comments = {
   successfulClaim: ({ user, issueNumber }) =>
     withMarker(
       AUTOMATION.claimWelcomeMarker,
-      `Hi @${user}, thanks for volunteering to take this on.\n\nIssue #${issueNumber} is now assigned to you. Before you start, please review CONTRIBUTING.md and keep your PR focused on this issue.\n\nPlease open your PR within 24 hours. If you need more time, leave a quick progress update and you are good to continue.`,
+      `Hi @${user}, thanks so much for volunteering to take this on! 🎉\n\n` +
+        `Issue #${issueNumber} is now officially assigned to you. Before you dive in, please take a moment to review **CONTRIBUTING.md**, and try to keep your PR focused on this issue so it's easy to review.\n\n` +
+        `⏳ Please open your PR within **24 hours**. If you need a bit more time, no worries — just leave a quick progress update here and you're good to continue.\n\n` +
+        `Excited to see what you build. Happy coding! 🚀`,
     ),
+
   alreadyAssigned: ({ assignee }) =>
-    `Thanks for checking in. This issue is currently assigned to @${assignee}.\n\nPlease take a look at other open unassigned issues, and feel free to claim one that matches your interests.`,
+    `Thanks so much for checking in! 🙌\n\n` +
+    `This issue is currently assigned to @${assignee}, so it's not available to claim right now.\n\n` +
+    `No worries though — take a look at our other open, unassigned issues and feel free to claim one that matches your interests. We'd love to have you on board! 💙`,
+
   maxIssueLimitReached: ({ user, activeCount }) =>
-    `Hi @${user}, you currently have ${activeCount} active assigned issues, and the current limit is 4.\n\nPlease complete or release one of your active issues with ${COMMANDS.unclaim}, then you can claim another.`,
+    `Hi @${user}, thanks for your enthusiasm — it does not go unnoticed! 🌟\n\n` +
+    `You currently have **${activeCount} active assigned issues**, and our current limit is **4** at a time, just so everyone gets a fair shot at contributing.\n\n` +
+    `Please complete or release one of your active issues with \`${COMMANDS.unclaim}\`, and then you're welcome to claim another right away.`,
+
   invalidClaim: ({ user }) =>
-    `Hi @${user}, to claim an issue please comment exactly \`${COMMANDS.claim}\`.\n\nIf you are new here, CONTRIBUTING.md has the full contribution workflow.`,
+    `Hi @${user}, thanks for wanting to jump in! 😊\n\n` +
+    `To claim an issue, please comment exactly \`${COMMANDS.claim}\` (no extra text).\n\n` +
+    `If you're new here, **CONTRIBUTING.md** has the full contribution workflow to help you get started smoothly.`,
+
   wrongIssueAuthorClaimAttempt: ({ user, issueAuthor }) =>
-    `Hi @${user}, this issue was opened by @${issueAuthor}.\n\nFor contributor-opened issues, automatic claiming is limited to the issue author.`,
+    `Hi @${user}, thank you for your interest in this issue! 🙏\n\n` +
+    `This particular issue was opened by @${issueAuthor}, and for contributor-opened issues, automatic claiming is limited to the issue author.\n\n` +
+    `We really appreciate your eagerness to contribute — please feel free to browse our other open issues, there's likely a great fit for you!`,
+
   duplicateClaim: ({ user }) =>
-    `Hi @${user}, you already have this issue assigned. You can continue your work and share updates here anytime.`,
+    `Hi @${user}, good news — you already have this issue assigned to you! ✅\n\n` +
+    `Feel free to continue your work, and share updates here anytime. We're rooting for you! 💪`,
+
   successfulUnclaim: ({ assignee }) =>
-    `Thanks @${assignee}, this issue has been released and is now available for other contributors to claim.`,
+    `Thanks so much, @${assignee}, for letting us know! 🙏\n\n` +
+    `This issue has been released and is now open for other contributors to claim.\n\n` +
+    `We really appreciate your honesty, and we'd love to see you back on another issue whenever you're ready!`,
+
   unauthorizedUnclaim: ({ actor, assignee }) =>
-    `Hi @${actor}, only @${assignee} or a maintainer can use ${COMMANDS.unclaim} on this issue.`,
+    `Hi @${actor}, thanks for reaching out! 😊\n\n` +
+    `Only @${assignee} or a maintainer can use \`${COMMANDS.unclaim}\` on this issue. If you believe this needs attention, feel free to tag a maintainer for help.`,
+
   noActiveClaimToRelease: ({ user }) =>
-    `Hi @${user}, there is no active claim on this issue right now.\n\nIf you would like to work on it, comment \`${COMMANDS.claim}\`.`,
+    `Hi @${user}, thanks for checking in! 🙂\n\n` +
+    `There's no active claim on this issue right now.\n\n` +
+    `If you'd like to work on it, just comment \`${COMMANDS.claim}\` and it's yours!`,
+
   manualAssignmentWelcome: ({ assignee, issueNumber }) =>
     withMarker(
       AUTOMATION.assignmentWelcomeMarker,
-      `Hi @${assignee}, welcome aboard.\n\nYou are now assigned to issue #${issueNumber}. Please follow CONTRIBUTING.md, keep the PR focused on this issue, and open your PR within 24 hours.\n\nIf anything blocks you, leave a short update and we can help.`,
+      `Hi @${assignee}, welcome aboard! 🎉\n\n` +
+        `You are now assigned to issue #${issueNumber}. Please follow **CONTRIBUTING.md**, keep your PR focused on this issue, and aim to open it within **24 hours**.\n\n` +
+        `If anything blocks you along the way, just leave a short update here — we're happy to help. Looking forward to your contribution! 🚀`,
     ),
+
   prOpened: ({ user, prNumber, prTitle }) =>
-    `Hi @${user}, thanks for opening PR #${prNumber} (${prTitle}).\n\nA quick validation pass is running now. If anything is missing, you will see it below with clear next steps.`,
+    `Hi @${user}, thank you so much for opening PR #${prNumber} (**${prTitle}**)! 🎉\n\n` +
+    `A quick validation pass is running now. If anything is missing, you'll see it below with clear next steps — nothing to worry about, we're here to help you get it merge-ready. 💙`,
+
   welcomeMessage: ({ user }) =>
-    `Hi @${user}, welcome to MeetOnMemory.\n\nWe are glad to have you here. Start with CONTRIBUTING.md, and feel free to ask questions in Discussions if you need help getting started.`,
+    `Hi @${user}, welcome to **MeetOnMemory**! 🎉\n\n` +
+    `We're so glad to have you here. Start with **CONTRIBUTING.md**, and feel free to ask questions in Discussions anytime you need a hand getting started.\n\n` +
+    `Excited to see what you'll bring to the project! 💙`,
+
   reminder12h: ({ assignee }) =>
     withMarker(
       AUTOMATION.reminder12Marker,
-      `Hi @${assignee}, just checking in.\n\nIt has been about 12 hours since this issue was assigned. If you are actively working on it, leave a short progress update or open a draft PR to keep the claim active.`,
+      `Hi @${assignee}, just a friendly check-in! 👋\n\n` +
+        `It's been about **12 hours** since this issue was assigned to you. If you're actively working on it, that's great — just leave a short progress update or open a draft PR to keep your claim active.\n\n` +
+        `No pressure, we just want to keep things moving smoothly for everyone. 😊`,
     ),
+
   reminder18h: ({ assignee }) =>
     withMarker(
       AUTOMATION.reminder18Marker,
-      `Hi @${assignee}, friendly reminder.\n\nIt has been around 18 hours without activity on this claim. If you are still working on it, please leave a quick update so we can keep it assigned to you.`,
+      `Hi @${assignee}, another friendly reminder! ⏰\n\n` +
+        `It's been around **18 hours** without any activity on this claim. If you're still working on it, please leave a quick update so we can keep it assigned to you.\n\n` +
+        `We'd hate to see you lose your spot — just a small update is all it takes! 💙`,
     ),
+
   expiration24h: ({ assignee }) =>
     withMarker(
       AUTOMATION.expiredMarker,
-      `Hi @${assignee}, thanks again for your interest in this issue.\n\nSince there was no activity in the 24-hour claim window, the issue has been released so other contributors can participate.\n\nIf it is still available and you want to continue, you are welcome to claim it again.`,
+      `Hi @${assignee}, thank you again for your interest in this issue! 🙏\n\n` +
+        `Since there was no activity within the **24-hour** claim window, the issue has been released so other contributors can get a chance to work on it.\n\n` +
+        `If it's still available and you'd like to continue, you're more than welcome to claim it again — we'd love to see you back! 😊`,
     ),
+
   prValidationChecklist: ({ body }) => withMarker(AUTOMATION.prChecklistMarker, body),
+
   prValidationSummary: ({ lines, missingLinkedIssueText, missingDescriptionText }) =>
-    `Hi @${lines.author}, thanks for your PR.\n\n### PR Review Checklist\n\n${lines.items.join("\n")}\n\n${missingLinkedIssueText}${missingDescriptionText}`,
+    `Hi @${lines.author}, thank you so much for your PR! 🎉\n\n` +
+    `### 📋 PR Review Checklist\n\n${lines.items.join("\n")}\n\n${missingLinkedIssueText}${missingDescriptionText}` +
+    `\nWe appreciate the effort you've put in — let us know if you need any help getting this across the finish line! 💪`,
+
   missingLinkedIssue: () =>
-    "Please link at least one issue in the PR description (for example `Closes #123`).\n",
+    "🔗 Please link at least one issue in the PR description (for example `Closes #123`). This helps us keep everything organized!\n",
+
   missingAssignment: ({ issueNumber, assignee }) =>
-    `Issue #${issueNumber} is currently assigned to @${assignee}. Please coordinate with the assignee or ask a maintainer for an override if needed.`,
+    `👀 Issue #${issueNumber} is currently assigned to @${assignee}. Please coordinate with the assignee, or feel free to ask a maintainer for an override if needed — we're happy to help sort things out!`,
+
   missingPrDescription: () =>
-    "Please add a clear PR description explaining what changed, why it changed, and how you tested it.",
+    "📝 Please add a clear PR description explaining what changed, why it changed, and how you tested it. A good description makes review so much smoother — thanks for taking the time!",
+
   issueClosed: ({ user, issueNumber }) =>
-    `Hi @${user}, issue #${issueNumber} has been closed. Claim reminders and assignment metadata were cleaned up.`,
+    `Hi @${user}, just letting you know issue #${issueNumber} has been closed. Claim reminders and assignment metadata were cleaned up automatically. Thanks for your involvement! 🙏`,
+
   issueReopened: ({ user, issueNumber }) =>
-    `Hi @${user}, issue #${issueNumber} has been reopened. Claim tracking has been reset so new activity is tracked correctly.`,
+    `Hi @${user}, heads up — issue #${issueNumber} has been reopened. 🔄\n\n` +
+    `Claim tracking has been reset so new activity is tracked correctly. Thanks for your patience!`,
+
   prMergedCongratulations: ({ user, prNumber, prTitle, issuesText }) =>
     withMarker(
       AUTOMATION.mergedMarker,
-      `Hi @${user}, thank you for the solid contribution.\n\nYour PR #${prNumber} (${prTitle}) has been merged.\n\n${issuesText}\n\nThe update fits nicely into the project and is genuinely appreciated. We would love to see you contribute again.\n\nIf you are enjoying MeetOnMemory, consider starring the repository.`,
+      `Hi @${user}, thank you so much for this solid contribution! 🎉🚀\n\n` +
+        `Your PR #${prNumber} (**${prTitle}**) has been merged. ✅\n\n` +
+        `${issuesText}\n\n` +
+        `This update fits nicely into the project and is genuinely appreciated — great work! We'd love to see you contribute again soon. 💙\n\n` +
+        `⭐ If you're enjoying **MeetOnMemory**, please consider starring the repository — it really helps us out!`,
     ),
+
   firstContributorWelcome: ({ user }) =>
     withMarker(
       AUTOMATION.firstWelcomeMarker,
-      `Hi @${user}, welcome to MeetOnMemory.\n\nGreat to have your first contribution here. Please start with CONTRIBUTING.md, and use Discussions anytime if you want feedback or help.`,
+      `Hi @${user}, welcome to **MeetOnMemory**! 🎉\n\n` +
+        `It's wonderful to have your very first contribution here — thank you for taking the time! Please start with **CONTRIBUTING.md**, and use Discussions anytime you'd like feedback or help.\n\n` +
+        `We're so glad you're here. Here's to many more contributions ahead! 💙`,
     ),
+
   naturalLanguageClaimGuidance: ({ user }) =>
-    `Hi @${user}, thanks for your interest in this issue.\n\nTo claim it, comment exactly \`${COMMANDS.claim}\`.\n\nYou can also review CONTRIBUTING.md for the full contribution flow.`,
+    `Hi @${user}, thanks so much for your interest in this issue! 😊\n\n` +
+    `To claim it, just comment exactly \`${COMMANDS.claim}\`.\n\n` +
+    `You can also check out **CONTRIBUTING.md** for the full contribution flow. We're excited to see you get started!`,
+
   issueAlreadyClaimed: ({ user }) =>
-    `Hi @${user}, this issue is already assigned to you. Feel free to continue and share progress here.`,
+    `Hi @${user}, this issue is already assigned to you! ✅\n\n` +
+    `Feel free to continue and share your progress here anytime — we're cheering you on! 💪`,
+
   issueUnavailable: ({ user }) =>
-    `Hi @${user}, this issue is not available to claim right now (it may be closed, locked, or archived).`,
+    `Hi @${user}, thanks for your interest! 🙏\n\n` +
+    `Unfortunately, this issue isn't available to claim right now (it may be closed, locked, or archived).\n\n` +
+    `No worries — there are plenty of other great issues open. Take a look and find one that suits you!`,
+
   maintainerOverrideNotification: ({ actor, target }) =>
     withMarker(
       AUTOMATION.overrideMarker,
-      `Maintainer update by @${actor}: assignment state was adjusted for @${target}.`,
+      `🔧 Maintainer update by @${actor}: assignment state was adjusted for @${target}.`,
     ),
 };

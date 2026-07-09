@@ -8,8 +8,10 @@ import MeetingSearch from "./MeetingSearch.jsx";
 import MeetingFilters from "./MeetingFilters.jsx";
 import Pagination from "./Pagination.jsx";
 import EmptyState from "./EmptyState.jsx";
+import { useNavigate } from "react-router-dom";
 
 const MeetingRepository = () => {
+  const navigate = useNavigate();
   const { backendUrl } = React.useContext(AppContent);
   const [meetings, setMeetings] = useState([]);
   const [filteredMeetings, setFilteredMeetings] = useState([]);
@@ -193,31 +195,8 @@ const MeetingRepository = () => {
     }
   };
 
-  const handleDownload = (meeting) => {
-    // Create a text file with meeting details
-    const content = `
-Meeting: ${meeting.title}
-Date: ${meeting.date ? new Date(meeting.date).toLocaleDateString() : "N/A"}
-Type: ${meeting.meetingType || "N/A"}
-Status: ${meeting.status || "N/A"}
-
-Summary:
-${meeting.summary || "No summary available"}
-
-Transcript:
-${meeting.transcript || "No transcript available"}
-    `.trim();
-
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${meeting.title.replace(/[^a-z0-9]/gi, "_")}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Meeting downloaded");
+  const handleView = (meeting) => {
+    navigate(`/meeting/${meeting._id}`);
   };
 
   const handleFilterChange = (key, value) => {
@@ -336,7 +315,7 @@ ${meeting.transcript || "No transcript available"}
                 meeting={meeting}
                 onDelete={handleDelete}
                 onRename={handleRename}
-                onDownload={handleDownload}
+                onView={handleView}
               />
             ))}
           </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import Navbar from "../components/Navbar.jsx";
 import axios from "axios";
 import AppContent from "../context/AppContent";
+import useExport from "../hooks/useExport.js";
 import { toast } from "react-toastify";
 import {
   FileText,
@@ -15,6 +16,7 @@ import {
   Pin,
   Mic,
   MicOff,
+  Download,
 } from "lucide-react";
 
 /**
@@ -36,6 +38,8 @@ const Summaries = () => {
   const [viewModal, setViewModal] = useState(null);
   const [pinnedIds, setPinnedIds] = useState([]);
   const [starredIds, setStarredIds] = useState([]);
+  const [openExportMenuId, setOpenExportMenuId] = useState(null);
+  const { exportMeeting, isExporting } = useExport();
 
   // 🎙️ Setup browser-based voice recognition
   useEffect(() => {
@@ -172,6 +176,10 @@ const Summaries = () => {
   const handleCopy = (summary) => {
     navigator.clipboard.writeText(summary.summary);
     toast.success("Summary copied!");
+  };
+
+  const handleExport = (meeting, format) => {
+    exportMeeting(meeting, format);
   };
 
   return (
@@ -328,23 +336,51 @@ const Summaries = () => {
                       View
                     </button>
 
-                    <button
-                      onClick={() => {
-                        const blob = new Blob(
-                          [summary.summary || summary.transcript || ""],
-                          { type: "text/plain;charset=utf-8" },
-                        );
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.href = url;
-                        a.download = `${summary.title || "meeting"}_summary.txt`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                      }}
-                      className="text-sm px-4 py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 ml-auto"
+                    <div 
+                      className="relative ml-auto"
+                      onMouseEnter={() => setOpenExportMenuId(summary._id)}
+                      onMouseLeave={() => setOpenExportMenuId(null)}
                     >
-                      Download
-                    </button>
+                      <button
+                        onClick={() => setOpenExportMenuId(openExportMenuId === summary._id ? null : summary._id)}
+                        disabled={isExporting}
+                        className="text-sm px-4 py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download size={16} /> {isExporting && openExportMenuId === summary._id ? "Exporting..." : "Export"}
+                      </button>
+                      
+                      {openExportMenuId === summary._id && (
+                        <div className="absolute right-0 bottom-full mb-2 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-[140px]">
+                          <button
+                            onClick={() => {
+                              handleExport(summary, "pdf");
+                              setOpenExportMenuId(null);
+                            }}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm text-gray-700"
+                          >
+                            Export as PDF
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleExport(summary, "docx");
+                              setOpenExportMenuId(null);
+                            }}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm text-gray-700"
+                          >
+                            Export as DOCX
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleExport(summary, "md");
+                              setOpenExportMenuId(null);
+                            }}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm text-gray-700"
+                          >
+                            Export as MD
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

@@ -6,13 +6,18 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
+
+concurrency:
+  group: contributors-gallery
+  cancel-in-progress: true
 
 jobs:
   update-contributors:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && github.event.pull_request.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.base.ref }}
@@ -21,26 +26,41 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: update contributors gallery
+      - name: Regenerate contributors gallery
         run: node scripts/update-contributors.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.pull_request.base.ref }}
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-      - name: Commit and push if README changed
+      - name: Create contributors update pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/update-contributors
+          delete-branch: true
+          title: "docs: update contributors gallery"
+          commit-message: "docs: update contributors gallery"
+          body: |
+            Automated contributor gallery refresh after a merged pull request.
+
+            - Rebuilt from full repository history
+            - Updated Hall of Fame (Top 5)
+            - Updated All Contributors avatars
+          labels: |
+            documentation
+            automation
+          assignees: imuniqueshiv
+          reviewers: imuniqueshiv
+      - name: Enable auto-merge when available
+        if: success()
+        continue-on-error: true
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git add README.md
-          if git diff --cached --quiet; then
-            echo "No changes to README."
-          else
-            git commit -m "docs: update contributors gallery"
-            git push origin HEAD:$BASE_REF
+          PR_NUMBER="$(gh pr list --head automation/update-contributors --state open --json number --jq '.[0].number')"
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr merge "$PR_NUMBER" --auto --merge
           fi

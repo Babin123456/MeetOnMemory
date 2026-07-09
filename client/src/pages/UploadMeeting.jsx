@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar.jsx";
 import AppContent from "../context/AppContent";
+import useExport from "../hooks/useExport.js";
 
 const UploadMeeting = () => {
   const { backendUrl, userData } = useContext(AppContent);
@@ -32,6 +33,8 @@ const UploadMeeting = () => {
   const [meetingId, setMeetingId] = useState(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [summary, setSummary] = useState("");
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const { exportMeeting, isExporting } = useExport();
 
   const fileInputRef = useRef(null);
 
@@ -223,6 +226,17 @@ const UploadMeeting = () => {
     } finally {
       setIsSummarizing(false);
     }
+  };
+
+  const handleExport = (format) => {
+    setShowExportMenu(false);
+    // Use the temporary generated mom object or saved object
+    const meetingToExport = {
+      _id: meetingId,
+      title: title,
+      structuredMoM: summary,
+    };
+    exportMeeting(meetingToExport, format);
   };
 
   const handleDownloadTranscript = () => {
@@ -586,6 +600,44 @@ const UploadMeeting = () => {
                         <Copy className="w-3.5 h-3.5" />
                         Copy
                       </button>
+
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowExportMenu(!showExportMenu)}
+                          disabled={isExporting}
+                          className="px-4 py-2 text-xs font-bold rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          {isExporting ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Download className="w-3.5 h-3.5" />
+                          )}
+                          {isExporting ? "Exporting..." : "Export MoM"}
+                        </button>
+                        {showExportMenu && (
+                          <div className="absolute bottom-full left-0 mb-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-20 overflow-hidden">
+                            <button
+                              onClick={() => handleExport("pdf")}
+                              className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors font-medium border-b border-gray-50"
+                            >
+                              Export as PDF
+                            </button>
+                            <button
+                              onClick={() => handleExport("docx")}
+                              className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors font-medium border-b border-gray-50"
+                            >
+                              Export as DOCX
+                            </button>
+                            <button
+                              onClick={() => handleExport("md")}
+                              className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                            >
+                              Export as Markdown
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
                       <button
                         onClick={() =>
                           toast.info(

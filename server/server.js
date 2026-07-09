@@ -21,6 +21,8 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import { initVectorStore } from "./utils/embeddingUtils.js";
 import meetingSocket from "./socket/meetingSocket.js";
 import { initRedis } from "./services/redisService.js";
+import { globalLimiter } from "./middleware/rateLimiter.js";
+
 dotenv.config();
 
 const app = express();
@@ -52,6 +54,11 @@ const csrfProtection = csrf({
 });
 
 app.use((req, res, next) => {
+  // Bypass CSRF in development to avoid localhost cross-origin cookie blocking
+  if (process.env.NODE_ENV !== "production") {
+    return next();
+  }
+
   if (req.method === "GET") {
     csrfProtection(req, res, (err) => {
       if (err) return next(err);
@@ -96,6 +103,9 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   }),
 );
+
+// Apply global rate limit after CORS
+app.use(globalLimiter);
 
 // ================================
 // STATIC FILES
