@@ -58,25 +58,28 @@ const About = () => {
   const headingRef = useIntersectionFade();
 
   return (
-    <section id="about" className="py-24 bg-linear-to-b from-white to-slate-50">
+    <section
+      id="about"
+      className="py-24 bg-linear-to-b from-white to-slate-50 dark:from-gray-900 dark:to-gray-800"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
         {/* Section Header */}
         <div
           ref={headingRef}
           className="fade-in-up text-center max-w-3xl mx-auto mb-16"
         >
-          <span className="inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-blue-50 text-blue-700 border border-blue-200">
+          <span className="inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700">
             About Us
           </span>
 
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mt-5 leading-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mt-5 leading-tight">
             About{" "}
             <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
               MeetOnMemory
             </span>
           </h2>
 
-          <p className="mt-5 text-base sm:text-lg text-gray-600 leading-relaxed">
+          <p className="mt-5 text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
             MeetOnMemory is an AI-powered knowledge management platform that
             transforms meetings into searchable, structured knowledge. Instead
             of losing valuable discussions, teams can instantly access
@@ -140,7 +143,7 @@ const AboutCard = (props) => {
   return (
     <div
       ref={ref}
-      className={`fade-in-up ${stagger} group bg-white border border-gray-200 rounded-2xl p-7 shadow-sm h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200`}
+      className={`fade-in-up ${stagger} group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-7 shadow-sm h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200 dark:hover:border-blue-600`}
     >
       <div
         className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.gradient} flex items-center justify-center text-white mx-auto mb-4 shadow-md group-hover:scale-110 transition-transform duration-300`}
@@ -148,11 +151,11 @@ const AboutCard = (props) => {
         <Icon className="w-5 h-5" />
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 text-center mb-2">
         {feature.title}
       </h3>
 
-      <p className="text-gray-500 leading-relaxed text-center text-sm">
+      <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-center text-sm">
         {feature.description}
       </p>
     </div>

@@ -19,8 +19,8 @@ const CreateOrganizationPage = () => {
     try {
       setLoading(true);
       const { data } = await organizationApi.createOrJoinOrganization({
-        name: orgName.trim(), 
-        role: "admin"
+        name: orgName.trim(),
+        role: "admin",
       });
 
       if (data.success) {

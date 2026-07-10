@@ -172,11 +172,16 @@ const MeetingRoom = () => {
       setLoading(false);
     } catch (err) {
       console.error("Camera/Mic access denied:", err);
-      let errMsg = "Camera or microphone access denied. Please enable them and retry.";
-      if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      let errMsg =
+        "Camera or microphone access denied. Please enable them and retry.";
+      if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
         errMsg = "Required media devices (camera or microphone) not found.";
-      } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        errMsg = "Permission denied. Please allow camera and microphone access in your browser settings.";
+      } else if (
+        err.name === "NotAllowedError" ||
+        err.name === "PermissionDeniedError"
+      ) {
+        errMsg =
+          "Permission denied. Please allow camera and microphone access in your browser settings.";
       }
       setMediaError(errMsg);
       toast.error(errMsg);
@@ -323,13 +328,13 @@ const MeetingRoom = () => {
 
           {mediaError ? (
             <div className="w-full max-w-lg mx-auto">
-              <ErrorState 
-                title="Device Access Error" 
-                message={mediaError} 
+              <ErrorState
+                title="Device Access Error"
+                message={mediaError}
                 onRetry={() => {
                   setMediaError(null);
                   joinMeeting();
-                }} 
+                }}
               />
             </div>
           ) : loading ? (

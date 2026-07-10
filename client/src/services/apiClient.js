@@ -14,7 +14,7 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     let friendlyMessage = "An unexpected error occurred. Please try again.";
-    
+
     // CSRF Retry Logic
     if (
       error.response &&
@@ -23,7 +23,7 @@ apiClient.interceptors.response.use(
       error.response.data.message === "CSRF token validation failed."
     ) {
       const originalRequest = error.config;
-      
+
       if (!originalRequest._retry) {
         originalRequest._retry = true;
         try {
@@ -39,17 +39,19 @@ apiClient.interceptors.response.use(
           }
         } catch (csrfErr) {
           console.error("Failed to refresh CSRF token", csrfErr);
-          friendlyMessage = "Session security token expired. Please refresh the page.";
+          friendlyMessage =
+            "Session security token expired. Please refresh the page.";
         }
       } else {
-        friendlyMessage = "Session security token expired. Please refresh the page.";
+        friendlyMessage =
+          "Session security token expired. Please refresh the page.";
       }
     }
 
-
     if (!error.response) {
       // Network error (offline or server not reachable)
-      friendlyMessage = "Network offline. Please check your internet connection.";
+      friendlyMessage =
+        "Network offline. Please check your internet connection.";
       // Mock the response so local catch blocks using error.response?.data?.message work
       error.response = { data: { message: friendlyMessage }, status: 0 };
     } else {
@@ -61,8 +63,11 @@ apiClient.interceptors.response.use(
               : "Session expired. Please log in again.";
           break;
         case 403:
-          if (error.response.data?.message !== "CSRF token validation failed.") {
-            friendlyMessage = "You do not have permission to perform this action.";
+          if (
+            error.response.data?.message !== "CSRF token validation failed."
+          ) {
+            friendlyMessage =
+              "You do not have permission to perform this action.";
           }
           break;
         case 404:
@@ -96,7 +101,7 @@ apiClient.interceptors.response.use(
     error.message = friendlyMessage;
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

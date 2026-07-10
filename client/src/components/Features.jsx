@@ -91,7 +91,7 @@ const FeatureCard = ({ icon, title, description, iconBg, index }) => {
   return (
     <div
       ref={ref}
-      className={`fade-in-up ${staggerClass} group bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 relative overflow-hidden cursor-default transition-all duration-300 hover:-translate-y-2`}
+      className={`fade-in-up ${staggerClass} group bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-600 relative overflow-hidden cursor-default transition-all duration-300 hover:-translate-y-2`}
       style={{
         boxShadow: "var(--shadow-card)",
       }}
@@ -110,10 +110,12 @@ const FeatureCard = ({ icon, title, description, iconBg, index }) => {
         {icon}
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-2 leading-snug">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
         {title}
       </h3>
-      <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
+      <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+        {description}
+      </p>
 
       {/* Hover glow overlay */}
       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-linear-to-br from-blue-500/[0.03] to-purple-500/[0.06]" />
@@ -142,23 +144,23 @@ const Features = () => {
   }, []);
 
   return (
-    <section id="features" className="py-24 px-4 bg-gray-50">
+    <section id="features" className="py-24 px-4 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         {/* Section Heading */}
         <div
           ref={headingRef}
           className="fade-in-up text-center mb-16 max-w-2xl mx-auto"
         >
-          <span className="inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-blue-50 text-blue-700 border border-blue-200 mb-5">
+          <span className="inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 mb-5">
             Features
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
             Powerful Features for{" "}
             <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Modern Organizations
             </span>
           </h2>
-          <p className="text-gray-500 mt-4 text-base leading-relaxed">
+          <p className="text-gray-500 dark:text-gray-400 mt-4 text-base leading-relaxed">
             Everything you need to capture, organize, and retrieve institutional
             knowledge — all in one place.
           </p>

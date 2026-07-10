@@ -32,11 +32,13 @@ const useFadeIn = () => {
 
 const StatItem = ({ emoji, label, sub }) => (
   <div className="text-center">
-    <div className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+    <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
       {emoji}
     </div>
-    <div className="text-sm font-semibold text-gray-800 mt-0.5">{label}</div>
-    <div className="text-xs text-gray-500">{sub}</div>
+    <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mt-0.5">
+      {label}
+    </div>
+    <div className="text-xs text-gray-500 dark:text-gray-400">{sub}</div>
   </div>
 );
 
@@ -56,13 +58,13 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-br from-blue-50 via-white to-purple-50 pt-16"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-slate-900 pt-16"
     >
       {/* Decorative background blobs */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-40 -right-40 w-72 h-72 sm:w-96 sm:h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob" />
-        <div className="absolute -bottom-40 -left-40 w-72 h-72 sm:w-96 sm:h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-96 sm:h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+        <div className="absolute -top-40 -right-40 w-72 h-72 sm:w-96 sm:h-96 bg-purple-300 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob" />
+        <div className="absolute -bottom-40 -left-40 w-72 h-72 sm:w-96 sm:h-96 bg-blue-300 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob animation-delay-2000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-96 sm:h-96 bg-indigo-300 dark:bg-indigo-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -70,7 +72,7 @@ const Hero = () => {
           {/* Left — Text Content */}
           <div ref={contentRef} className="fade-in-up text-center lg:text-left">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-semibold mb-6 border border-blue-200">
+            <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full text-sm font-semibold mb-6 border border-blue-200 dark:border-blue-700">
               <span className="relative flex h-2 w-2" aria-hidden="true">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
@@ -79,7 +81,7 @@ const Hero = () => {
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 leading-[1.1] tracking-tight mb-6">
               Never Lose{" "}
               <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Meeting Knowledge
@@ -88,7 +90,7 @@ const Hero = () => {
             </h1>
 
             {/* Description */}
-            <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               MeetOnMemory is an AI-powered platform that transforms meeting
               recordings and transcripts into searchable, structured knowledge.
               Preserve institutional memory and make every conversation count.
@@ -108,16 +110,16 @@ const Hero = () => {
               <button
                 onClick={handleLearnMore}
                 id="hero-learn-more-btn"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-gray-700 rounded-xl font-semibold text-base border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 hover:shadow-lg active:scale-100 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl font-semibold text-base border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 hover:shadow-lg active:scale-100 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-blue-500"
                 aria-label="Learn more about MeetOnMemory features"
               >
-                <FaPlay className="text-blue-600 text-sm" />
+                <FaPlay className="text-blue-600 dark:text-blue-400 text-sm" />
                 Learn More
               </button>
             </div>
 
             {/* Statistics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-12 pt-8 border-t border-gray-200">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
               <StatItem
                 emoji="⚡"
                 label="AI-Powered"
@@ -145,17 +147,17 @@ const Hero = () => {
           >
             <div className="relative w-full max-w-sm sm:max-w-md animate-float">
               {/* Glow rings */}
-              <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-blue-400/20 to-purple-400/20 blur-2xl scale-110" />
+              <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-blue-400/20 to-purple-400/20 dark:from-blue-600/20 dark:to-purple-600/20 blur-2xl scale-110" />
 
               {/* Dashboard card */}
-              <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 p-5 sm:p-6">
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-5 sm:p-6">
                 {/* Mockup browser chrome */}
-                <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-100">
+                <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-100 dark:border-gray-700">
                   <div className="w-3 h-3 bg-red-400 rounded-full" />
                   <div className="w-3 h-3 bg-yellow-400 rounded-full" />
                   <div className="w-3 h-3 bg-green-400 rounded-full" />
-                  <div className="flex-1 mx-3 h-6 bg-gray-100 rounded-md flex items-center px-3">
-                    <span className="text-xs text-gray-400 truncate">
+                  <div className="flex-1 mx-3 h-6 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center px-3">
+                    <span className="text-xs text-gray-400 dark:text-gray-300 truncate">
                       meetonmemory.app/dashboard
                     </span>
                   </div>

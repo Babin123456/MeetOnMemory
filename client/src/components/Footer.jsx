@@ -20,7 +20,7 @@ const Footer = () => {
 
   if (!isLandingPage) {
     return (
-      <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
+      <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Left: Brand logo & Copyright */}
@@ -54,32 +54,37 @@ const Footer = () => {
                   <circle cx="25" cy="50" r="6.5" fill="#2563eb" />
                   <circle cx="75" cy="50" r="6.5" fill="#7c3aed" />
                 </svg>
-                <span className="font-bold text-sm text-gray-900 tracking-tight">
-                  MeetOn<span className="text-blue-600">Memory</span>
+                <span className="font-bold text-sm text-gray-900 dark:text-gray-100 tracking-tight">
+                  MeetOn
+                  <span className="text-blue-600 dark:text-blue-400">
+                    Memory
+                  </span>
                 </span>
               </Link>
-              <span className="hidden sm:inline text-gray-300">|</span>
-              <span className="text-xs text-gray-500">
+              <span className="hidden sm:inline text-gray-300 dark:text-gray-600">
+                |
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 &copy; {currentYear} MeetOnMemory. All rights reserved.
               </span>
-              <span className="px-2 py-0.5 text-[10px] font-semibold text-gray-500 bg-gray-100 rounded-full">
+              <span className="px-2 py-0.5 text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
                 v1.0.0
               </span>
             </div>
 
             {/* Right: Links & Back to Top */}
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-gray-500">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-gray-500 dark:text-gray-400">
               <a
                 href="#"
                 onClick={(e) => e.preventDefault()}
-                className="hover:text-blue-600 transition-colors duration-200"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
                 Privacy Policy
               </a>
               <a
                 href="#"
                 onClick={(e) => e.preventDefault()}
-                className="hover:text-blue-600 transition-colors duration-200"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
                 Terms of Service
               </a>
@@ -87,14 +92,14 @@ const Footer = () => {
                 href="https://github.com/imuniqueshiv/MeetOnMemory"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 hover:text-blue-600 transition-colors duration-200"
+                className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
                 <Github className="w-3.5 h-3.5" />
                 GitHub
               </a>
               <button
                 onClick={scrollToTop}
-                className="flex items-center gap-1 hover:text-blue-600 transition-colors duration-200 group"
+                className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group"
                 aria-label="Scroll back to top"
               >
                 <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
@@ -108,7 +113,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-white border-t border-gray-200 pt-16 pb-8 mt-auto">
+    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-16 pb-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
           {/* Column 1: Project Info */}
@@ -145,14 +150,15 @@ const Footer = () => {
                   <circle cx="75" cy="50" r="6.5" fill="#7c3aed" />
                 </svg>
               </div>
-              <span className="font-bold text-xl text-gray-900 tracking-tight">
-                MeetOn<span className="text-blue-600">Memory</span>
+              <span className="font-bold text-xl text-gray-900 dark:text-gray-100 tracking-tight">
+                MeetOn
+                <span className="text-blue-600 dark:text-blue-400">Memory</span>
               </span>
             </div>
-            <p className="text-gray-600 text-sm font-medium leading-snug">
+            <p className="text-gray-600 dark:text-gray-300 text-sm font-medium leading-snug">
               AI-Powered Meeting Memory &amp; Management Platform
             </p>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed">
               Transform meetings, discussions, and organizational knowledge into
               a searchable and structured repository using AI.
             </p>
@@ -162,7 +168,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="MeetOnMemory GitHub repository"
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 mt-1 group w-fit"
+              className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200 mt-1 group w-fit"
             >
               <Github className="w-4 h-4 group-hover:scale-110 transition-transform" />
               View on GitHub
@@ -171,14 +177,14 @@ const Footer = () => {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-5">
               Quick Links
             </h3>
             <ul className="flex flex-col gap-3">
               <li>
                 <Link
                   to="/"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   Home
                 </Link>
@@ -186,7 +192,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => handleNavLink("#features")}
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block text-left"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block text-left"
                   aria-label="Scroll to Features section"
                 >
                   Features
@@ -195,7 +201,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => handleNavLink("#how-it-works")}
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block text-left"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block text-left"
                   aria-label="Scroll to How It Works section"
                 >
                   How It Works
@@ -204,7 +210,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => handleNavLink("#about")}
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block text-left"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block text-left"
                   aria-label="Scroll to About section"
                 >
                   About
@@ -213,7 +219,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/dashboard"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   Dashboard
                 </Link>
@@ -221,7 +227,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/login"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   Login
                 </Link>
@@ -231,7 +237,7 @@ const Footer = () => {
 
           {/* Column 3: Resources */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-5">
               Resources
             </h3>
             <ul className="flex flex-col gap-3">
@@ -241,7 +247,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="MeetOnMemory GitHub repository (opens in new tab)"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   GitHub Repository
                 </a>
@@ -252,7 +258,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Report issues on GitHub (opens in new tab)"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   Report Issues
                 </a>
@@ -263,7 +269,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Contributing guide (opens in new tab)"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   Contributing
                 </a>
@@ -274,7 +280,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Code of Conduct (opens in new tab)"
-                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors duration-200 inline-block"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
                 >
                   Code of Conduct
                 </a>
@@ -284,7 +290,7 @@ const Footer = () => {
 
           {/* Column 4: Built with */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-5">
               Built with
             </h3>
             <ul className="flex flex-col gap-2.5">
@@ -298,7 +304,7 @@ const Footer = () => {
               ].map((tech) => (
                 <li
                   key={tech}
-                  className="flex items-center gap-2 text-sm text-gray-500"
+                  className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                 >
                   <span
                     className="w-1.5 h-1.5 rounded-full bg-linear-to-br from-blue-600 to-violet-600 flex-shrink-0"
@@ -312,18 +318,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-gray-400 text-sm">
+        <div className="pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-gray-400 dark:text-gray-500 text-sm">
             &copy; {currentYear} MeetOnMemory. All rights reserved.
           </p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 dark:text-gray-500 text-sm">
             Built with ❤️ by the MeetOnMemory Community.
           </p>
           {/* Back to top */}
           <button
             onClick={scrollToTop}
             aria-label="Scroll back to top"
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-blue-600 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md px-1"
+            className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md px-1"
           >
             <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform duration-200" />
             Back to top

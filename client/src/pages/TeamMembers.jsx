@@ -29,7 +29,6 @@ const ROLE_LABELS = {
 };
 
 const TeamMembers = () => {
-
   const [members, setMembers] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [loading, setLoading] = useState(true);

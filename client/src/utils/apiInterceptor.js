@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Setup interceptor on the default axios instance
 axios.interceptors.response.use(
@@ -10,7 +10,8 @@ axios.interceptors.response.use(
 
     if (!error.response) {
       // Network error (offline or server not reachable)
-      friendlyMessage = "Network offline. Please check your internet connection.";
+      friendlyMessage =
+        "Network offline. Please check your internet connection.";
       // Mock the response so local catch blocks using error.response?.data?.message work
       error.response = { data: { message: friendlyMessage }, status: 0 };
     } else {
@@ -22,7 +23,8 @@ axios.interceptors.response.use(
               : "Session expired. Please log in again.";
           break;
         case 403:
-          friendlyMessage = "You do not have permission to perform this action.";
+          friendlyMessage =
+            "You do not have permission to perform this action.";
           break;
         case 404:
           friendlyMessage = "The requested resource was not found.";
@@ -39,11 +41,11 @@ axios.interceptors.response.use(
         default:
           // Use backend provided message if available, otherwise keep default
           if (error.response.data && error.response.data.message) {
-             friendlyMessage = error.response.data.message;
+            friendlyMessage = error.response.data.message;
           }
           break;
       }
-      
+
       // Inject the friendly message back into the response so local catch blocks display it
       if (error.response.data) {
         error.response.data.message = friendlyMessage;
@@ -51,9 +53,9 @@ axios.interceptors.response.use(
         error.response.data = { message: friendlyMessage };
       }
     }
-    
+
     error.message = friendlyMessage;
 
     return Promise.reject(error);
-  }
+  },
 );

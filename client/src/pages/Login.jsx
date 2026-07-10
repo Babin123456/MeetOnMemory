@@ -71,7 +71,7 @@ const Login = () => {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-linear-to-br from-blue-200 to-purple-400 overflow-hidden px-4 sm:px-6">
+    <div className="relative flex items-center justify-center min-h-screen bg-linear-to-br from-blue-200 to-purple-400 dark:from-gray-900 dark:to-slate-900 overflow-hidden px-4 sm:px-6">
       {/* Ambient background gradients */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-[128px] " />

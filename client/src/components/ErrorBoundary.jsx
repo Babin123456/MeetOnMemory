@@ -27,17 +27,20 @@ class ErrorBoundary extends React.Component {
       // You can render any custom fallback UI
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-          <ErrorState 
-            title="Oops! Something went wrong." 
-            message={this.state.error?.message || "An unexpected application error occurred."} 
-            onRetry={this.handleRetry} 
-            retryText="Try Again" 
+          <ErrorState
+            title="Oops! Something went wrong."
+            message={
+              this.state.error?.message ||
+              "An unexpected application error occurred."
+            }
+            onRetry={this.handleRetry}
+            retryText="Try Again"
           />
         </div>
       );
     }
 
-    return this.props.children; 
+    return this.props.children;
   }
 }
 
