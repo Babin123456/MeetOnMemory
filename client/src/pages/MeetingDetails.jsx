@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
-import AppContent from "../context/AppContent.js";
-
+import { meetingApi } from "../services";
 import MeetingHeader from "../components/meeting-details/MeetingHeader";
 import MeetingSummary from "../components/meeting-details/MeetingSummary";
 import MeetingTranscript from "../components/meeting-details/MeetingTranscript";
@@ -14,8 +12,6 @@ import MeetingActions from "../components/meeting-details/MeetingActions";
 const MeetingDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { backendUrl } = React.useContext(AppContent);
-
   const [meeting, setMeeting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,10 +21,7 @@ const MeetingDetails = () => {
       try {
         setLoading(true);
         setError(null);
-        const { data } = await axios.get(`${backendUrl}/api/meetings/${id}`, {
-          withCredentials: true,
-        });
-
+        const { data } = await meetingApi.getMeetingById(id);
         if (data.success) {
           setMeeting(data.meeting);
         } else {
@@ -45,17 +38,11 @@ const MeetingDetails = () => {
     };
 
     fetchMeetingDetails();
-  }, [id, backendUrl]);
+  }, [id]);
 
   const handleDelete = async (meetingId) => {
     try {
-      const { data } = await axios.delete(
-        `${backendUrl}/api/meetings/delete/${meetingId}`,
-        {
-          withCredentials: true,
-        },
-      );
-
+      const { data } = await meetingApi.deleteMeeting(meetingId);
       if (data.success) {
         toast.success("Meeting deleted successfully");
         navigate("/summaries");
@@ -70,12 +57,7 @@ const MeetingDetails = () => {
 
   const handleRename = async (meetingId, newTitle) => {
     try {
-      const { data } = await axios.patch(
-        `${backendUrl}/api/meetings/${meetingId}`,
-        { title: newTitle },
-        { withCredentials: true },
-      );
-
+      const { data } = await meetingApi.updateMeeting(meetingId, { title: newTitle });
       if (data.success) {
         toast.success("Meeting renamed successfully");
         setMeeting({ ...meeting, title: newTitle });

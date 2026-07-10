@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { meetingApi } from "../../services";
 import { Trash2, Download, Edit2, Eye, Search, Filter } from "lucide-react";
 import AppContent from "../../context/AppContent";
 import MeetingCard from "./MeetingCard.jsx";
@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 
 const MeetingRepository = () => {
   const navigate = useNavigate();
-  const { backendUrl } = React.useContext(AppContent);
   const [meetings, setMeetings] = useState([]);
   const [filteredMeetings, setFilteredMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +33,7 @@ const MeetingRepository = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${backendUrl}/api/meetings/all`, {
-        withCredentials: true,
-      });
+      const response = await meetingApi.getAllMeetings();
 
       if (response.data?.success) {
         setMeetings(response.data.meetings || []);
@@ -53,7 +50,6 @@ const MeetingRepository = () => {
 
   useEffect(() => {
     fetchMeetings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Apply filters and search
@@ -158,10 +154,7 @@ const MeetingRepository = () => {
     }
 
     try {
-      const response = await axios.delete(
-        `${backendUrl}/api/meetings/delete/${meetingId}`,
-        { withCredentials: true },
-      );
+      const response = await meetingApi.deleteMeeting(meetingId);
 
       if (response.data?.success) {
         toast.success("Meeting deleted successfully");
@@ -177,11 +170,7 @@ const MeetingRepository = () => {
 
   const handleRename = async (meetingId, newTitle) => {
     try {
-      const response = await axios.put(
-        `${backendUrl}/api/meetings/${meetingId}`,
-        { title: newTitle },
-        { withCredentials: true },
-      );
+      const response = await meetingApi.updateMeeting(meetingId, { title: newTitle });
 
       if (response.data?.success) {
         toast.success("Meeting renamed successfully");

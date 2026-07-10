@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
-import axios from "axios";
 import { toast } from "react-toastify";
 import AppContent from "../context/AppContent";
+import { analyticsApi } from "../services";
 import { Bar, Line, Pie } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import { Loader2, Brain, BarChart4, PieChart } from "lucide-react";
@@ -10,7 +10,6 @@ import { Loader2, Brain, BarChart4, PieChart } from "lucide-react";
 Chart.register(...registerables);
 
 const Reports = () => {
-  const { backendUrl } = useContext(AppContent);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [aiInsights, setAiInsights] = useState("");
@@ -20,11 +19,7 @@ const Reports = () => {
     const fetchAIInsights = async (summary) => {
       try {
         const prompt = `Based on these platform stats, provide 2 actionable insights for productivity: ${JSON.stringify(summary)}`;
-        const aiRes = await axios.post(
-          `${backendUrl}/api/chat/ask`,
-          { message: prompt },
-          { withCredentials: true },
-        );
+        const aiRes = await analyticsApi.askAnalyticsChat({ message: prompt });
         if (aiRes.data.success) {
           setAiInsights(aiRes.data.reply);
         } else {
@@ -38,9 +33,7 @@ const Reports = () => {
 
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get(`${backendUrl}/api/analytics`, {
-          withCredentials: true,
-        });
+        const res = await analyticsApi.getAnalytics();
 
         if (res.data.success) {
           setData(res.data);
@@ -56,7 +49,7 @@ const Reports = () => {
       }
     };
     fetchAnalytics();
-  }, [backendUrl]);
+  }, []);
 
   if (loading)
     return (

@@ -1,13 +1,13 @@
 // client/src/pages/JoinOrganizationPage.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import AppContent from "../context/AppContent";
 import { toast } from "react-toastify";
 import Navbar from "../components/Navbar.jsx";
+import { organizationApi } from "../services";
 
 const JoinOrganizationPage = () => {
-  const { backendUrl, getUserData } = useContext(AppContent);
+  const { getUserData } = useContext(AppContent);
   const [orgList, setOrgList] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const JoinOrganizationPage = () => {
   useEffect(() => {
     const fetchOrgs = async () => {
       try {
-        const { data } = await axios.get(`${backendUrl}/api/organizations`);
+        const { data } = await organizationApi.getAllOrganizations();
         if (data.success) setOrgList(data.organizations);
       } catch {
         toast.error("Failed to load organizations");
@@ -24,16 +24,13 @@ const JoinOrganizationPage = () => {
       }
     };
     fetchOrgs();
-  }, [backendUrl]);
+  }, []);
 
   const handleJoin = async (orgId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/organizations/join`,
-        {
-          organizationId: orgId,
-        },
-      );
+      const { data } = await organizationApi.joinOrganization({
+        organizationId: orgId,
+      });
 
       if (data.success) {
         toast.success("Joined organization successfully!");

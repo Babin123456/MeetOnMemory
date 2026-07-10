@@ -1,8 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import AppContent from "../context/AppContent";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { meetingApi } from "../services";
 import {
   FileText,
   Calendar,
@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 
 const CreateMeeting = () => {
-  const { backendUrl } = useContext(AppContent);
   const [activeSection, setActiveSection] = useState("live");
   const [loading, setLoading] = useState(false);
 
@@ -133,11 +132,7 @@ const CreateMeeting = () => {
         agendaItems,
       };
 
-      const response = await axios.post(
-        `${backendUrl}/api/meetings/schedule`,
-        payload,
-        { withCredentials: true },
-      );
+      const response = await meetingApi.scheduleMeeting(payload);
 
       if (response.data?.success) {
         toast.success("✅ Meeting scheduled and synced to calendars!");
@@ -215,17 +210,11 @@ const CreateMeeting = () => {
 
   // Notify backend to push notifications
   if (liveParticipants.length > 0) {
-    axios
-      .post(
-        `${backendUrl}/api/meetings/notify-live`,
-        {
-          roomId,
-          participants: liveParticipants,
-        },
-        {
-          withCredentials: true,
-        },
-      )
+    meetingApi
+      .notifyLive({
+        roomId,
+        participants: liveParticipants,
+      })
       .catch((error) => {
         console.error("Failed to notify participants:", error);
       });
@@ -291,14 +280,7 @@ const CreateMeeting = () => {
         formData.append("video", videoFile);
       }
 
-      const response = await axios.post(
-        `${backendUrl}/api/sessions/generate`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        },
-      );
+      const response = await meetingApi.generateSession(formData);
 
       if (response.data?.success) {
         toast.success("✨ AI Session card generated successfully!");

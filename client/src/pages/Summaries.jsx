@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../components/Navbar.jsx";
-import axios from "axios";
+import { meetingApi } from "../services";
 import AppContent from "../context/AppContent";
 import useExport from "../hooks/useExport.js";
 import { toast } from "react-toastify";
@@ -27,7 +27,6 @@ import {
  */
 
 const Summaries = () => {
-  const { backendUrl } = useContext(AppContent);
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -91,9 +90,7 @@ const Summaries = () => {
   useEffect(() => {
     const fetchSummaries = async () => {
       try {
-        const res = await axios.get(`${backendUrl}/api/meetings/all`, {
-          withCredentials: true,
-        });
+        const res = await meetingApi.getAllMeetings();
 
         if (res.data?.success) {
           setSummaries(res.data.meetings || []);
@@ -109,7 +106,7 @@ const Summaries = () => {
     };
 
     fetchSummaries();
-  }, [backendUrl]);
+  }, []);
 
   // 🔍 Filter meetings by title or summary
   const filteredSummaries = summaries.filter(
@@ -138,12 +135,7 @@ const Summaries = () => {
       return;
 
     try {
-      const res = await axios.delete(
-        `${backendUrl}/api/meetings/delete/${id}`,
-        {
-          withCredentials: true,
-        },
-      );
+      const res = await meetingApi.deleteMeeting(id);
 
       if (res.data?.success) {
         setSummaries((prev) => prev.filter((s) => s._id !== id));

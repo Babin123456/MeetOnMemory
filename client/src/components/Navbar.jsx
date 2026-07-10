@@ -1,9 +1,9 @@
 // client/src/components/Navbar.jsx
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
 import AppContent from "../context/AppContent";
 import { toast } from "react-toastify";
+import { notificationApi, authApi } from "../services";
 import { io } from "socket.io-client";
 import {
   Menu,
@@ -67,10 +67,7 @@ const Navbar = () => {
     if (userData && backendUrl) {
       const fetchUnreadCount = async () => {
         try {
-          const { data } = await axios.get(
-            `${backendUrl}/api/notifications/unread-count`,
-            { withCredentials: true },
-          );
+          const { data } = await notificationApi.getUnreadCount();
           if (data.success) {
             setUnreadCount(data.unreadCount);
           }
@@ -81,9 +78,7 @@ const Navbar = () => {
 
       const fetchRecentNotifications = async () => {
         try {
-          const { data } = await axios.get(`${backendUrl}/api/notifications`, {
-            withCredentials: true,
-          });
+          const { data } = await notificationApi.getNotifications();
           if (data.success) {
             setNotifications(
               data.notifications.slice(0, 5).map((n) => ({
@@ -207,11 +202,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `${backendUrl}/api/auth/logout`,
-        {},
-        { withCredentials: true },
-      );
+      await authApi.logout();
     } catch (err) {
       console.warn(
         "Backend logout cookie clearance skipped locally:",

@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useCallback } from "react";
 import AppContent from "../context/AppContent";
 import Navbar from "../components/Navbar.jsx";
+import { organizationApi } from "../services";
 import {
   Users,
   Search,
@@ -29,7 +29,6 @@ const ROLE_LABELS = {
 };
 
 const TeamMembers = () => {
-  const { backendUrl } = useContext(AppContent);
 
   const [members, setMembers] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
@@ -46,12 +45,7 @@ const TeamMembers = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await axios.get(
-        `${backendUrl}/api/organization/members`,
-        {
-          withCredentials: true,
-        },
-      );
+      const { data } = await organizationApi.getMembers();
 
       if (data.success) {
         setMembers(data.members);
@@ -65,7 +59,7 @@ const TeamMembers = () => {
     } finally {
       setLoading(false);
     }
-  }, [backendUrl]);
+  }, []);
 
   const applyFiltersAndSort = useCallback(() => {
     let result = [...members];

@@ -1,5 +1,4 @@
 import React, { useState, useContext, useRef } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import {
   UploadCloud,
@@ -20,9 +19,10 @@ import {
 import Navbar from "../components/Navbar.jsx";
 import AppContent from "../context/AppContent";
 import useExport from "../hooks/useExport.js";
+import { meetingApi } from "../services";
 
 const UploadMeeting = () => {
-  const { backendUrl, userData } = useContext(AppContent);
+  const { userData } = useContext(AppContent);
 
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -133,20 +133,14 @@ const UploadMeeting = () => {
       // don't force title here; user may leave it blank -> backend will auto-generate later
       if (title) formData.append("title", title);
 
-      const res = await axios.post(
-        `${backendUrl}/api/meetings/upload`,
-        formData,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-          onUploadProgress: (progressEvent) => {
-            const percent = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total,
-            );
-            setUploadProgress(percent);
-          },
+      const res = await meetingApi.uploadMeeting(formData, {
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
+          setUploadProgress(percent);
         },
-      );
+      });
 
       if (res.data?.success) {
         toast.success("Transcription complete!");
@@ -194,15 +188,7 @@ const UploadMeeting = () => {
         title: title || undefined, // backend will auto-generate if missing
       };
 
-      const res = await axios.post(
-        `${backendUrl}/api/meetings/summarize`,
-        payload,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-          timeout: 120000,
-        },
-      );
+      const res = await meetingApi.summarizeMeeting(payload);
 
       if (res.data?.success) {
         // backend returns structured object plus a human readable summary text

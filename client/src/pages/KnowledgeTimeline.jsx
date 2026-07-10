@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import AppContent from "../context/AppContent";
 import Navbar from "../components/Navbar.jsx";
+import { knowledgeApi } from "../services";
 
 const KnowledgeTimeline = () => {
   const { decisionId } = useParams();
-  const { backendUrl } = useContext(AppContent);
 
   const [lineage, setLineage] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,12 +13,7 @@ const KnowledgeTimeline = () => {
   useEffect(() => {
     const fetchLineage = async () => {
       try {
-        const res = await axios.get(
-          `${backendUrl}/api/knowledge/decisions/${decisionId}/lineage`,
-          {
-            withCredentials: true,
-          },
-        );
+        const res = await knowledgeApi.getDecisionLineage(decisionId);
 
         if (res.data?.success) {
           setLineage(res.data.lineage);
@@ -32,7 +26,7 @@ const KnowledgeTimeline = () => {
     };
 
     fetchLineage();
-  }, [backendUrl, decisionId]);
+  }, [decisionId]);
 
   return (
     <div>

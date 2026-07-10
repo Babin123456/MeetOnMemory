@@ -1,10 +1,8 @@
-import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import AppContent from "./AppContent.js";
 import { useNavigate } from "react-router-dom";
-
-axios.defaults.withCredentials = true;
+import { authApi } from "../services";
 
 export const AppContextProvider = ({ children }) => {
   const backendUrl =
@@ -18,9 +16,7 @@ export const AppContextProvider = ({ children }) => {
 
   const getUserData = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/auth/user-data`, {
-        withCredentials: true,
-      });
+      const { data } = await authApi.getUserData();
 
       if (data.success && data.user) {
         setUserData(data.user);
@@ -37,13 +33,11 @@ export const AppContextProvider = ({ children }) => {
       localStorage.removeItem("userData");
       return null;
     }
-  }, [backendUrl]);
+  }, []);
 
   const getAuthState = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`, {
-        withCredentials: true,
-      });
+      const { data } = await authApi.getAuthState();
 
       if (data.success) {
         setIsLoggedin(true);
@@ -64,7 +58,7 @@ export const AppContextProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [backendUrl, getUserData, isLoggingOut]);
+  }, [getUserData, isLoggingOut]);
 
   useEffect(() => {
     getAuthState();
@@ -78,13 +72,7 @@ export const AppContextProvider = ({ children }) => {
 
       navigate("/"); //FORCE REDIRECT TO LANDING PAGE (Prevents the 404 page)
 
-      await axios.post(
-        `${backendUrl}/api/auth/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
+      await authApi.logout();
 
       setIsLoggedin(false);
       setUserData(null);

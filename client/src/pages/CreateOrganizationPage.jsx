@@ -2,13 +2,13 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import AppContent from "../context/AppContent";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { organizationApi } from "../services";
 import Navbar from "/src/components/Navbar.jsx";
 
 const CreateOrganizationPage = () => {
   const navigate = useNavigate();
-  const { backendUrl, getUserData } = useContext(AppContent);
+  const { getUserData } = useContext(AppContent);
   const [orgName, setOrgName] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -18,12 +18,10 @@ const CreateOrganizationPage = () => {
 
     try {
       setLoading(true);
-      axios.defaults.withCredentials = true;
-
-      const { data } = await axios.post(
-        `${backendUrl}/api/organizations/create-or-join`,
-        { name: orgName.trim(), role: "admin" },
-      );
+      const { data } = await organizationApi.createOrJoinOrganization({
+        name: orgName.trim(), 
+        role: "admin"
+      });
 
       if (data.success) {
         toast.success(data.message);

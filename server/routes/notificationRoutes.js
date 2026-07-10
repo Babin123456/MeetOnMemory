@@ -16,8 +16,8 @@ notificationRouter.use(userAuth, apiLimiter);
 
 notificationRouter.get("/", getNotifications);
 notificationRouter.get("/unread-count", getUnreadCount);
-notificationRouter.patch("/:id/read", writeLimiter, markAsRead);
 notificationRouter.patch("/mark-all-read", writeLimiter, markAllAsRead);
+notificationRouter.patch("/:id/read", writeLimiter, markAsRead);
 notificationRouter.delete("/:id", writeLimiter, deleteNotification);
 
 export default notificationRouter;

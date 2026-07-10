@@ -1,14 +1,13 @@
 import React, {
   useState,
   useEffect,
-  useContext,
-  useMemo,
   useRef,
   useCallback,
+  useMemo,
 } from "react";
 import Navbar from "../components/Navbar.jsx";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { policyApi } from "../services";
 import AppContent from "../context/AppContent";
 import {
   Upload,
@@ -319,8 +318,6 @@ const DropZone = ({ onFile, disabled, selectedFile }) => {
 // Main Component
 // ──────────────────────────────────────────────
 const Policies = () => {
-  const { backendUrl } = useContext(AppContent);
-
   // Upload state
   const [file, setFile] = useState(null);
   const [commitMsg, setCommitMsg] = useState("");
@@ -351,9 +348,7 @@ const Policies = () => {
   const fetchPolicies = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${backendUrl}/api/policies`, {
-        withCredentials: true,
-      });
+      const res = await policyApi.getPolicies();
       if (res.data.success) setPolicies(res.data.policies || []);
       else toast.error(res.data.message || "Failed to load policies.");
     } catch (err) {
@@ -372,7 +367,7 @@ const Policies = () => {
     } finally {
       setLoading(false);
     }
-  }, [backendUrl]);
+  }, []);
 
   useEffect(() => {
     fetchPolicies();
@@ -420,20 +415,14 @@ const Policies = () => {
     setUploadProgress(0);
 
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/policies/upload${isUpdate ? "?update=true" : ""}`,
-        formData,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-          onUploadProgress: (event) => {
-            if (event.total) {
-              const pct = Math.round((event.loaded * 100) / event.total);
-              setUploadProgress(Math.min(pct, 85)); // cap at 85 — rest is AI processing
-            }
-          },
+      const res = await policyApi.uploadPolicy(formData, isUpdate, {
+        onUploadProgress: (event) => {
+          if (event.total) {
+            const pct = Math.round((event.loaded * 100) / event.total);
+            setUploadProgress(Math.min(pct, 85)); // cap at 85 — rest is AI processing
+          }
         },
-      );
+      });
 
       if (res.data.success) {
         setUploadStage("done");
@@ -488,10 +477,7 @@ const Policies = () => {
   // ── Download ──
   const handleDownload = async (policyId, filename = "policy.pdf") => {
     try {
-      const res = await axios.get(
-        `${backendUrl}/api/policies/download/${policyId}`,
-        { responseType: "blob", withCredentials: true },
-      );
+      const res = await policyApi.downloadPolicy(policyId);
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -512,9 +498,7 @@ const Policies = () => {
   // ── Delete ──
   const handleDelete = async (policyId) => {
     try {
-      const res = await axios.delete(`${backendUrl}/api/policies/${policyId}`, {
-        withCredentials: true,
-      });
+      const res = await policyApi.deletePolicy(policyId);
       if (res.data.success) {
         toast.success("Policy deleted.");
         setConfirmDelete(null);
@@ -540,11 +524,7 @@ const Policies = () => {
   const handleReanalyze = async (policyId) => {
     toast.info("🤖 Re-analyzing policy with AI…");
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/policies/${policyId}/analyze`,
-        {},
-        { withCredentials: true },
-      );
+      const res = await policyApi.analyzePolicy(policyId);
       if (res.data.success) {
         toast.success("✅ AI analysis complete!");
         fetchPolicies();

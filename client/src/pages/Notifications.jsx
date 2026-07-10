@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import AppContent from "../context/AppContent";
 import { toast } from "react-toastify";
 import Navbar from "../components/Navbar.jsx";
+import { notificationApi } from "../services";
 import {
   Bell,
   Check,
@@ -61,7 +61,7 @@ const formatTimeAgo = (dateString) => {
 };
 
 const Notifications = () => {
-  const { backendUrl, userData } = useContext(AppContent);
+  const { userData } = useContext(AppContent);
   const navigate = useNavigate();
 
   const [notifications, setNotifications] = useState([]);
@@ -79,10 +79,7 @@ const Notifications = () => {
       if (filter !== "all") params.status = filter;
       if (categoryFilter !== "all") params.category = categoryFilter;
 
-      const { data } = await axios.get(`${backendUrl}/api/notifications`, {
-        params,
-        withCredentials: true,
-      });
+      const { data } = await notificationApi.getNotifications(params);
 
       if (data.success) {
         setNotifications(data.notifications);
@@ -95,7 +92,7 @@ const Notifications = () => {
     } finally {
       setLoading(false);
     }
-  }, [backendUrl, filter, categoryFilter]);
+  }, [filter, categoryFilter]);
 
   useEffect(() => {
     if (userData) {
@@ -105,11 +102,7 @@ const Notifications = () => {
 
   const handleMarkAsRead = async (id) => {
     try {
-      const { data } = await axios.patch(
-        `${backendUrl}/api/notifications/${id}/read`,
-        {},
-        { withCredentials: true },
-      );
+      const { data } = await notificationApi.markAsRead(id);
 
       if (data.success) {
         setNotifications((prev) =>
@@ -126,11 +119,7 @@ const Notifications = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      const { data } = await axios.patch(
-        `${backendUrl}/api/notifications/mark-all-read`,
-        {},
-        { withCredentials: true },
-      );
+      const { data } = await notificationApi.markAllAsRead();
 
       if (data.success) {
         setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
@@ -145,10 +134,7 @@ const Notifications = () => {
 
   const handleDelete = async (id) => {
     try {
-      const { data } = await axios.delete(
-        `${backendUrl}/api/notifications/${id}`,
-        { withCredentials: true },
-      );
+      const { data } = await notificationApi.deleteNotification(id);
 
       if (data.success) {
         setNotifications((prev) => {

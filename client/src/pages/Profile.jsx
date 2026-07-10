@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { userApi } from "../services";
 import AppContent from "../context/AppContent";
 import {
   User,
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
-  const { backendUrl, userData, setUserData } = useContext(AppContent);
+  const { userData, setUserData } = useContext(AppContent);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profilePicFailed, setProfilePicFailed] = useState(false);
@@ -109,15 +109,11 @@ const Profile = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.put(
-        `${backendUrl}/api/user/update`,
-        {
-          name: name.trim(),
-          profilePic: profilePic.trim(),
-          bio: bio.trim(),
-        },
-        { withCredentials: true },
-      );
+      const { data } = await userApi.updateProfile({
+        name: name.trim(),
+        profilePic: profilePic.trim(),
+        bio: bio.trim(),
+      });
 
       if (data.success) {
         toast.success(data.message || "Profile updated successfully!");
@@ -203,15 +199,11 @@ const Profile = () => {
                           JSON.stringify(cleared),
                         );
                         try {
-                          await axios.put(
-                            `${backendUrl}/api/user/update`,
-                            {
-                              name: userData.name,
-                              profilePic: "",
-                              bio: userData.bio,
-                            },
-                            { withCredentials: true },
-                          );
+                          await userApi.updateProfile({
+                            name: userData.name,
+                            profilePic: "",
+                            bio: userData.bio,
+                          });
                         } catch {
                           // silent
                         }

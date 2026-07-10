@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
-import axios from "axios";
+import { knowledgeApi } from "../services";
 import AppContent from "../context/AppContent";
 import { toast } from "react-toastify";
 import {
@@ -83,7 +83,6 @@ const PRIORITY_STYLES = {
 };
 
 const Tasks = () => {
-  const { backendUrl } = useContext(AppContent);
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
@@ -113,12 +112,7 @@ const Tasks = () => {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get(
-          `${backendUrl}/api/knowledge/action-items?status=all`,
-          {
-            withCredentials: true,
-          },
-        );
+        const res = await knowledgeApi.getActionItems("all");
 
         if (res.data?.success) {
           const items = res.data.actionItems.map((item) => ({
@@ -152,7 +146,7 @@ const Tasks = () => {
     };
 
     fetchTasks();
-  }, [backendUrl]);
+  }, []);
 
   // Get unique values for filters
   const organizations = [...new Set(tasks.map((t) => t.organization))];

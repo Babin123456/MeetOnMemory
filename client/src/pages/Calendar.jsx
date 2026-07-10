@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { meetingApi } from "../services";
 import AppContent from "../context/AppContent";
 import Navbar from "../components/Navbar.jsx";
 import {
@@ -26,7 +26,6 @@ import {
 
 const Calendar = () => {
   const navigate = useNavigate();
-  const { backendUrl } = useContext(AppContent);
 
   // States
   const [meetings, setMeetings] = useState([]);
@@ -45,9 +44,7 @@ const Calendar = () => {
     const fetchMeetings = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`${backendUrl}/api/meetings/all`, {
-          withCredentials: true,
-        });
+        const { data } = await meetingApi.getAllMeetings();
         if (data.success) {
           setMeetings(data.meetings || []);
         } else {
@@ -62,7 +59,7 @@ const Calendar = () => {
     };
 
     fetchMeetings();
-  }, [backendUrl]);
+  }, []);
 
   // Handle outside click to close modal
   useEffect(() => {
