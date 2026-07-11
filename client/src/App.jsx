@@ -44,7 +44,7 @@ const App = () => {
 
   const hideFooterRoutes = ["/login"];
   const shouldShowFooter = !hideFooterRoutes.includes(location.pathname);
-  
+
   // Only activate navigation controller panel when exactly on the landing page fold
   const shouldShowScrollNavigator = location.pathname === "/";
 
@@ -292,7 +292,9 @@ const App = () => {
         {!isMobile && (
           <>
             <div className={`custom-cursor ${isHovered ? "hovered" : ""}`} />
-            <div className={`custom-cursor-ring ${isHovered ? "hovered" : ""}`} />
+            <div
+              className={`custom-cursor-ring ${isHovered ? "hovered" : ""}`}
+            />
           </>
         )}
       </ErrorBoundary>

@@ -154,7 +154,9 @@ app.use("/api/knowledge", knowledgeRoutes);
 // Initialize vector store in background to avoid blocking server startup
 initVectorStore()
   .then(() => console.log("✅ Vector store initialized"))
-  .catch((error) => console.error("⚠️ Vector store initialization failed:", error.message));
+  .catch((error) =>
+    console.error("⚠️ Vector store initialization failed:", error.message),
+  );
 
 // ================================
 // START SERVER
