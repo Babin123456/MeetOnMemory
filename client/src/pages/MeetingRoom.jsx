@@ -71,7 +71,7 @@ const MeetingRoom = () => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  // Format time for the timer
+  // Format time for the duration timer
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
@@ -362,28 +362,20 @@ const MeetingRoom = () => {
           <div className="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-20 shrink-0">
             <div className="flex items-center gap-4">
               <h2 className="text-lg font-bold text-white truncate max-w-xs md:max-w-md">
-                {title}
+                Room: {roomId}
               </h2>
-              {isRecording ? (
-                <div className="flex items-center gap-2 text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
-                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                  <span className="text-xs font-semibold uppercase tracking-wider">
-                    Recording
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-gray-300 bg-gray-800 px-3 py-1 rounded-full text-sm font-mono">
-                  Ready
-                </div>
-              )}
+              <div className="flex items-center gap-2 text-gray-300 bg-gray-800 px-3 py-1 rounded-full text-sm font-mono">
+                <Clock size={14} />
+                <span>{formatTime(duration)}</span>
+              </div>
               <div className="flex items-center gap-2 text-gray-300 bg-gray-800 px-3 py-1 rounded-full text-sm">
                 <Users size={16} />
-                <span>{participants.length}</span>
+                <span>{peers.length + 1}</span>
               </div>
             </div>
 
             <button
-              onClick={handleCopyLink}
+              onClick={copyLink}
               className="text-gray-300 hover:text-white flex items-center gap-1.5 text-sm font-semibold bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl transition-all cursor-pointer"
             >
               <Copy size={16} />
@@ -391,23 +383,22 @@ const MeetingRoom = () => {
             </button>
           </div>
 
-          {/* Grid Layout */}
+          {/* Video Grid */}
           <div className="flex-1 p-6 overflow-y-auto bg-gray-900 flex items-center justify-center">
             <div className="w-full h-full max-w-5xl flex flex-col md:flex-row gap-6 items-center justify-center min-h-[300px]">
               {/* Local Stream */}
-              <div className="relative bg-black rounded-2xl overflow-hidden shadow-lg aspect-video flex-1 min-w-[280px] max-w-[600px] border border-gray-800 group">
-                {videoOn && localStream ? (
-                  <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover scale-x-[-1]"
-                  />
-                ) : (
+              <div className="relative bg-black rounded-2xl overflow-hidden shadow-lg aspect-video flex-1 min-w-[280px] max-w-[600px] border border-gray-800">
+                <video
+                  ref={userVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover scale-x-[-1]"
+                />
+                {!cameraOn && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
                     <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-xl">
-                      {userData ? getInitials(userData.name) : "U"}
+                      You
                     </div>
                   </div>
                 )}
@@ -415,22 +406,24 @@ const MeetingRoom = () => {
                   <span
                     className={`w-2 h-2 rounded-full ${micOn ? "bg-green-500" : "bg-red-500"}`}
                   />
-                  <span>You ({userData?.name || "Member"})</span>
+                  <span>You</span>
                 </div>
               </div>
 
               {/* Remote Streams */}
-              {participants
-                .filter((p) => p.userId !== userData?._id)
-                .map((participant) => (
-                  <RemoteVideo key={participant.userId} participant={participant} />
-                ))}
+              {peers.map((peerObj) => (
+                <PeerVideo
+                  key={peerObj.peerID}
+                  peer={peerObj.peer}
+                  userInfo={peerObj.userInfo}
+                />
+              ))}
             </div>
           </div>
 
           {/* Control Bar */}
           <div className="h-24 bg-gray-900 border-t border-gray-800 flex items-center justify-center gap-4 px-6 z-20 shrink-0">
-            {/* Audio Toggle */}
+            {/* Mic Toggle */}
             <button
               onClick={toggleMic}
               className={`p-4 rounded-full transition-all shadow-md active:scale-95 cursor-pointer ${
@@ -438,37 +431,40 @@ const MeetingRoom = () => {
                   ? "bg-gray-800 text-white hover:bg-gray-700"
                   : "bg-red-500 text-white hover:bg-red-600"
               }`}
+              aria-label={micOn ? "Mute microphone" : "Unmute microphone"}
             >
               {micOn ? <Mic size={22} /> : <MicOff size={22} />}
             </button>
 
-            {/* Video Toggle */}
+            {/* Camera Toggle */}
             <button
-              onClick={toggleVideo}
+              onClick={toggleCamera}
               className={`p-4 rounded-full transition-all shadow-md active:scale-95 cursor-pointer ${
-                videoOn
+                cameraOn
                   ? "bg-gray-800 text-white hover:bg-gray-700"
                   : "bg-red-500 text-white hover:bg-red-600"
               }`}
+              aria-label={cameraOn ? "Turn off camera" : "Turn on camera"}
             >
-              {videoOn ? <VideoIcon size={22} /> : <VideoOff size={22} />}
+              {cameraOn ? <Video size={22} /> : <VideoOff size={22} />}
             </button>
 
-            {/* Screen Share (Dummy toggle for now) */}
+            {/* Screen Share */}
             <button
-              onClick={() => setScreenShareOn(!screenShareOn)}
+              onClick={toggleScreenShare}
               className={`p-4 rounded-full transition-all shadow-md active:scale-95 cursor-pointer ${
-                screenShareOn
+                isScreenSharing
                   ? "bg-indigo-500 text-white hover:bg-indigo-600"
                   : "bg-gray-800 text-white hover:bg-gray-700"
               }`}
+              aria-label={isScreenSharing ? "Stop screen share" : "Share screen"}
             >
-              <ScreenShare size={22} />
+              <MonitorUp size={22} />
             </button>
 
             <div className="w-px h-8 bg-gray-700 mx-2"></div>
 
-            {/* End / Leave button */}
+            {/* Leave */}
             <button
               onClick={leaveMeeting}
               className="px-6 py-4 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 shadow-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
