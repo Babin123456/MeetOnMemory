@@ -29,7 +29,10 @@ import webhookRoutes from "./routes/webhookRoutes.js";
 
 import { initVectorStore } from "./utils/embeddingUtils.js";
 import meetingSocket from "./socket/meetingSocket.js";
-import { initRedis } from "./services/redisService.js";
+import documentSync from "./socket/documentSync.js";
+import { initRedis, getRedisClient } from "./services/redisService.js";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
 import { initAIWorker } from "./services/queueService.js";
 import { initWebhookWorker } from "./services/webhookDispatcherService.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
@@ -40,31 +43,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env.local if it exists, otherwise fallback to .env
-const envPath = path.resolve(__dirname, '.env.local');
+const envPath = path.resolve(__dirname, ".env.local");
 dotenv.config({ path: envPath });
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// ================================
 // DATABASE & CACHE
-// ================================
 await connectDB();
 if (process.env.NODE_ENV !== "test") {
   initRedis(); // Non-blocking: allows server to start even if Redis is unavailable
 }
 
-// ================================
 // MIDDLEWARES
-// ================================
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ================================
 // CORS (must be before CSRF)
-// ================================
 const allowedOrigins = [
   "http://localhost:5173",
   "https://localhost:5173",
@@ -93,9 +90,7 @@ app.use(
   }),
 );
 
-// ================================
 // CSRF PROTECTION (CodeQL Fix)
-// ================================
 const csrfProtection = csrf({
   cookie: {
     key: "_csrf",
@@ -131,14 +126,10 @@ app.use((req, res, next) => {
 // Apply global rate limit after CORS
 app.use(globalLimiter);
 
-// ================================
 // STATIC FILES
-// ================================
 app.use("/uploads", express.static("uploads"));
 
-// ================================
 // HEALTH CHECK
-// ================================
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -154,9 +145,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ================================
 // ROUTES
-// ================================
 app.use("/api/auth", authRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/organizations-new", organizationRoutesNew);
@@ -176,9 +165,7 @@ app.use("/api/policy-compliance", policyComplianceRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/webhooks", webhookRoutes);
 
-// ================================
 // VECTOR STORE INIT (Non-blocking)
-// ================================
 // Initialize vector store in background to avoid blocking server startup
 if (process.env.NODE_ENV !== "test") {
   initVectorStore()
@@ -188,9 +175,7 @@ if (process.env.NODE_ENV !== "test") {
     );
 }
 
-// ================================
 // START SERVER
-// ================================
 let server;
 if (process.env.NODE_ENV !== "test") {
   server = app.listen(PORT, () => {
@@ -202,9 +187,7 @@ if (process.env.NODE_ENV !== "test") {
   server = http.createServer(app);
 }
 
-// ================================
 // SOCKET.IO
-// ================================
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -215,15 +198,49 @@ const io = new Server(server, {
 
 app.set("io", io);
 
+// REDIS PUB/SUB ADAPTER (Horizontal Scaling)
+// Enables collaborative editing to work across multiple server instances.
+// Gracefully skips if Redis is not configured.
+(async () => {
+  const redisUri = process.env.REDIS_URI || process.env.REDIS_URL;
+  if (redisUri) {
+    try {
+      const pubClient = createClient({ url: redisUri });
+      const subClient = pubClient.duplicate();
+
+      pubClient.on("error", (err) => {
+        console.error("❌ Redis PubClient Error:", err.message);
+      });
+      subClient.on("error", (err) => {
+        console.error("❌ Redis SubClient Error:", err.message);
+      });
+
+      await Promise.all([pubClient.connect(), subClient.connect()]);
+      io.adapter(createAdapter(pubClient, subClient));
+      console.log(
+        "✅ Socket.io Redis Pub/Sub adapter attached (horizontal scaling enabled)",
+      );
+    } catch (err) {
+      console.warn(
+        "⚠️  Redis adapter failed — running in single-instance mode:",
+        err.message,
+      );
+    }
+  } else {
+    console.log(
+      "ℹ️  No REDIS_URI/REDIS_URL set — Socket.io running in single-instance mode",
+    );
+  }
+})();
+
 meetingSocket(io);
+documentSync(io);
 if (process.env.NODE_ENV !== "test") {
   initAIWorker(app);
   initWebhookWorker();
 }
 
-// ================================
 // ERROR HANDLER
-// ================================
 app.use((err, req, res, next) => {
   console.error(err);
 
@@ -240,9 +257,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ================================
 // GRACEFUL SHUTDOWN
-// ================================
 process.on("SIGTERM", () => {
   console.log("SIGTERM received. Shutting down gracefully...");
   server.close(() => {
