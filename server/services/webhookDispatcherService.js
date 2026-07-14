@@ -7,24 +7,44 @@ import eventBus from "./eventBus.js";
 
 const redisUri = process.env.REDIS_URI;
 
-// Initialize Redis connection for BullMQ if configured
-const connection = redisUri
-  ? new Redis(redisUri, {
+let _connection = null;
+let _webhookQueueInstance = null;
+
+function getConnection() {
+  if (!redisUri) return null;
+  if (!_connection) {
+    _connection = new Redis(redisUri, {
       maxRetriesPerRequest: null,
       family: 0,
-    })
-  : null;
-
-if (connection) {
-  connection.on("error", (err) => {
-    console.error("⚠️ Webhook Redis Connection Error:", err.message);
-  });
+    });
+    _connection.on("error", (err) => {
+      console.error("⚠️ Webhook Redis Connection Error:", err.message);
+    });
+  }
+  return _connection;
 }
 
-// Initialize BullMQ Queue
-export const webhookQueue = connection
-  ? new Queue("webhook-dispatches", { connection })
-  : null;
+function getWebhookQueue() {
+  if (!redisUri) return null;
+  if (!_webhookQueueInstance) {
+    const conn = getConnection();
+    if (conn) {
+      _webhookQueueInstance = new Queue("webhook-dispatches", { connection: conn });
+    }
+  }
+  return _webhookQueueInstance;
+}
+
+export const webhookQueue = {
+  add: async (...args) => {
+    const q = getWebhookQueue();
+    if (!q) {
+      console.warn("⚠️ Queue operation ignored: Redis is not configured.");
+      return null;
+    }
+    return await q.add(...args);
+  }
+};
 
 /**
  * Signs the payload using HMAC SHA-256 with the webhook's secret.
@@ -146,6 +166,7 @@ export const dispatchWebhookEvent = async (organizationId, event, data) => {
  * Initializes the Webhook worker listening on the dispatch queue.
  */
 export const initWebhookWorker = () => {
+  const connection = getConnection();
   if (!connection) {
     console.warn(
       "⚠️ Redis not configured. Webhook background worker will not start (falling back to sync dispatch).",

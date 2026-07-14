@@ -27,28 +27,71 @@ const __dirname = path.dirname(__filename);
 const redisUri = process.env.REDIS_URI;
 
 // BullMQ requires maxRetriesPerRequest to be null
-const connection = redisUri
-  ? new Redis(redisUri, {
+let _connection = null;
+let _aiQueueInstance = null;
+let _dataExportQueueInstance = null;
+
+function getConnection() {
+  if (!redisUri) return null;
+  if (!_connection) {
+    _connection = new Redis(redisUri, {
       maxRetriesPerRequest: null,
       family: 0, // Helps with DNS resolution for some cloud providers
-    })
-  : null;
-
-if (connection) {
-  connection.on("error", (err) => {
-    console.error("⚠️ BullMQ Redis Connection Error:", err.message);
-  });
+    });
+    _connection.on("error", (err) => {
+      console.error("⚠️ BullMQ Redis Connection Error:", err.message);
+    });
+  }
+  return _connection;
 }
 
-export const aiQueue = connection
-  ? new Queue("ai-mom-generation", { connection })
-  : null;
+function getAiQueue() {
+  if (!redisUri) return null;
+  if (!_aiQueueInstance) {
+    const conn = getConnection();
+    if (conn) {
+      _aiQueueInstance = new Queue("ai-mom-generation", { connection: conn });
+    }
+  }
+  return _aiQueueInstance;
+}
 
-export const dataExportQueue = connection
-  ? new Queue("data-export-queue", { connection })
-  : null;
+function getDataExportQueue() {
+  if (!redisUri) return null;
+  if (!_dataExportQueueInstance) {
+    const conn = getConnection();
+    if (conn) {
+      _dataExportQueueInstance = new Queue("data-export-queue", { connection: conn });
+    }
+  }
+  return _dataExportQueueInstance;
+}
+
+// Wrapper to preserve syntax compatibility
+export const aiQueue = {
+  add: async (...args) => {
+    const q = getAiQueue();
+    if (!q) {
+      console.warn("⚠️ Queue operation ignored: Redis is not configured.");
+      return null;
+    }
+    return await q.add(...args);
+  }
+};
+
+export const dataExportQueue = {
+  add: async (...args) => {
+    const q = getDataExportQueue();
+    if (!q) {
+      console.warn("⚠️ Queue operation ignored: Redis is not configured.");
+      return null;
+    }
+    return await q.add(...args);
+  }
+};
 
 export const initAIWorker = (app) => {
+  const connection = getConnection();
   if (!connection) {
     console.warn("⚠️ Redis not configured. AI Worker will not start.");
     return;
@@ -372,6 +415,7 @@ ${textToSummarize}
 };
 
 export const initDataExportWorker = (app) => {
+  const connection = getConnection();
   if (!connection) {
     console.warn("⚠️ Redis not configured. Data Export Worker will not start.");
     return;

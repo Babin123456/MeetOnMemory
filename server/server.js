@@ -58,9 +58,6 @@ const PORT = process.env.PORT || 4000;
 
 // DATABASE & CACHE
 await connectDB();
-if (process.env.NODE_ENV !== "test") {
-  initRedis(); // Non-blocking: allows server to start even if Redis is unavailable
-}
 
 // MIDDLEWARES
 const allowedOrigins = [
@@ -130,13 +127,7 @@ app.get("/api/csrf-token", csrfProtection, (req, res) => {
 });
 
 // VECTOR DB WARMUP
-// Vector store initializes lazily in the background. It won't block the app start
-// but ensures early readiness.
-if (process.env.NODE_ENV !== "test") {
-  initVectorStore().catch((err) => {
-    console.error("⚠️ Failed to pre-warm vector store:", err.message);
-  });
-}
+// (Pre-warming moved to server.listen callback for lazy background startup)
 
 // ROUTES
 app.use("/api/auth", authRoutes);
@@ -178,6 +169,16 @@ const server = http.createServer(app);
 if (process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => {
     console.log(`🚀 MeetOnMemory Server running on port ${PORT}`);
+
+    // Asynchronously initialize background services after server starts listening
+    initRedis();
+    initAIWorker(app);
+    initDataExportWorker(app);
+    initWebhookWorker();
+
+    initVectorStore().catch((err) => {
+      console.error("⚠️ Failed to pre-warm vector store:", err.message);
+    });
   });
 }
 
@@ -229,11 +230,7 @@ app.set("io", io);
 
 meetingSocket(io);
 documentSync(io);
-if (process.env.NODE_ENV !== "test") {
-  initAIWorker(app);
-  initDataExportWorker(app);
-  initWebhookWorker();
-}
+// (AI, Data Export, and Webhook workers are initialized inside server.listen callback)
 
 // ERROR HANDLER
 app.use(errorHandler);
