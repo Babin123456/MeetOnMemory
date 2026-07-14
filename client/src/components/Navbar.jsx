@@ -272,7 +272,7 @@ const Navbar = () => {
     return currentPath === tabPath;
   };
 
-  const appLinks = [
+  const primaryLinks = [
     {
       label: t("navbar.dashboard"),
       href: "/dashboard",
@@ -292,6 +292,25 @@ const Navbar = () => {
       permission: { resource: "tasks", action: "view" },
     },
     {
+      label: t("navbar.organizations"),
+      href: "/organizations",
+      icon: Building2,
+      permission: { resource: "organizations", action: "view" },
+    },
+    {
+      label: t("navbar.aiSearch"),
+      href: "/ai-search",
+      icon: Search,
+      permission: { resource: "ai_search", action: "search" },
+    },
+  ].filter(
+    (link) =>
+      !link.permission ||
+      hasPermission(link.permission.resource, link.permission.action),
+  );
+
+  const secondaryLinks = [
+    {
       label: t("navbar.compliance"),
       href: "/policy-compliance",
       icon: ShieldAlert,
@@ -309,23 +328,14 @@ const Navbar = () => {
       icon: Users,
       permission: { resource: "team_members", action: "view" },
     },
-    {
-      label: t("navbar.organizations"),
-      href: "/organizations",
-      icon: Building2,
-      permission: { resource: "organizations", action: "view" },
-    },
-    {
-      label: t("navbar.aiSearch"),
-      href: "/ai-search",
-      icon: Search,
-      permission: { resource: "ai_search", action: "search" },
-    },
   ].filter(
     (link) =>
       !link.permission ||
       hasPermission(link.permission.resource, link.permission.action),
   );
+
+  // Retain all allowed links for the mobile drawer navigation
+  const appLinks = [...primaryLinks, ...secondaryLinks];
 
   return (
     <header
@@ -390,26 +400,18 @@ const Navbar = () => {
               className="hidden md:flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 p-1 rounded-2xl"
               aria-label="Application navigation"
             >
-              {appLinks.map((link) => {
-                const Icon = link.icon;
+              {primaryLinks.map((link) => {
                 const active = isTabActive(link.href);
                 return (
                   <button
                     key={link.href}
                     onClick={() => navigate(link.href)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer ${
+                    className={`flex items-center px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer ${
                       active
                         ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-xs border border-gray-100/50 dark:border-gray-600/50"
                         : "text-gray-600 dark:text-gray-300 border border-transparent hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
                     }`}
                   >
-                    <Icon
-                      className={`w-4 h-4 transition-transform duration-200 ${
-                        active
-                          ? "scale-110 text-blue-600 dark:text-blue-400"
-                          : "text-gray-400 dark:text-gray-500"
-                      }`}
-                    />
                     <span>{link.label}</span>
                   </button>
                 );
@@ -629,21 +631,43 @@ const Navbar = () => {
                           <Settings className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                           {t("navbar.settings")}
                         </button>
-
-                        {userData?.role === "admin" && (
-                          <button
-                            onClick={() => {
-                              setMenuOpen(false);
-                              navigate("/admin-panel");
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 rounded-xl transition-colors text-left cursor-pointer"
-                            role="menuitem"
-                          >
-                            <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
-                            {t("navbar.adminPanel")}
-                          </button>
-                        )}
                       </div>
+
+                      {(secondaryLinks.length > 0 || userData?.role === "admin") && (
+                        <div className="border-t border-gray-100 dark:border-gray-700 p-1">
+                          {secondaryLinks.map((link) => {
+                            const LinkIcon = link.icon;
+                            return (
+                              <button
+                                key={link.href}
+                                onClick={() => {
+                                  setMenuOpen(false);
+                                  navigate(link.href);
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 rounded-xl transition-colors text-left cursor-pointer"
+                                role="menuitem"
+                              >
+                                <LinkIcon className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+                                {link.label}
+                              </button>
+                            );
+                          })}
+
+                          {userData?.role === "admin" && (
+                            <button
+                              onClick={() => {
+                                setMenuOpen(false);
+                                navigate("/admin-panel");
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 rounded-xl transition-colors text-left cursor-pointer"
+                              role="menuitem"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+                              {t("navbar.adminPanel")}
+                            </button>
+                          )}
+                        </div>
+                      )}
 
                       <div className="border-t border-gray-100 dark:border-gray-600 p-1">
                         <button
