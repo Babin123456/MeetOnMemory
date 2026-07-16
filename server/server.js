@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import csrf from "csurf";
 import { Server } from "socket.io";
 import http from "http";
 
@@ -60,79 +59,21 @@ const PORT = process.env.PORT || 4000;
 // DATABASE & CACHE
 await connectDB();
 
+import { corsOptions, allowedOrigins } from "./config/corsOptions.js";
+import { csrfMiddleware, csrfTokenProvider } from "./middleware/csrfProtection.js";
+
 // MIDDLEWARES
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://127.0.0.1:5173",
-  "http://127.0.0.1:5174",
-  process.env.CLIENT_URL,
-].filter(Boolean);
+app.use(cors(corsOptions));
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn(`Blocked by CORS: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
-  }),
-);
-
-// Capture the raw request body so Slack's signing-secret HMAC verification
-// can read it before the JSON/urlencoded parsers consume the stream.
-app.use(express.json({
-  limit: "50mb",
-  verify: (req, _res, buf) => {
-    req.rawBody = buf;
-  },
-}));
-app.use(express.urlencoded({
-  extended: true,
-  limit: "50mb",
-  verify: (req, _res, buf) => {
-    req.rawBody = buf;
-  },
-}));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 // Enforce CSRF protection on mutation routes
-const csrfProtection = csrf({
-  cookie: {
-    key: "_csrf",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  },
-});
-
-app.use((req, res, next) => {
-  const isSafeMethod = ["GET", "HEAD", "OPTIONS"].includes(req.method);
-  const isAuthRoute = req.path.startsWith("/api/auth");
-  const isSyncPath = req.path.startsWith("/sync");
-  // Slack cannot send CSRF tokens — exclude all Slack endpoints
-  const isSlackRoute = req.path.startsWith("/api/slack");
-
-  if (
-    isSafeMethod ||
-    isAuthRoute ||
-    isSyncPath ||
-    isSlackRoute ||
-    process.env.NODE_ENV === "test"
-  ) {
-    return next();
-  }
-  return csrfProtection(req, res, next);
-});
+app.use(csrfMiddleware);
 
 // CSRF token provider
-app.get("/api/csrf-token", csrfProtection, (req, res) => {
+app.get("/api/csrf-token", csrfTokenProvider, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
@@ -156,9 +97,11 @@ app.use("/api/user", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/knowledge", knowledgeRoutes);
 app.use("/api/compliance", policyComplianceRoutes);
+import { slackWebhookParser } from "./middleware/slackWebhookParser.js";
+
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/webhooks", webhookRoutes);
-app.use("/api/slack", slackRoutes);
+app.use("/api/slack", slackWebhookParser, slackRoutes);
 
 // Health check endpoint — registered BEFORE the global rate limiter so
 // keep-alive pings (e.g. from GitHub Actions cron job) are never blocked.
