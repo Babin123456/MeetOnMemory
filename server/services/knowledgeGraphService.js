@@ -4,7 +4,7 @@ import { embedText } from "../utils/embeddingUtils.js";
 
 const SIMILARITY_THRESHOLD = 0.85; // conservative, per issue's technical considerations
 
-function cosineSimilarity(a, b) {
+export function cosineSimilarity(a, b) {
   if (!a?.length || !b?.length || a.length !== b.length) return 0;
   let dot = 0,
     normA = 0,

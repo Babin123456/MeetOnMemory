@@ -11,6 +11,10 @@ import {
   getOpenActionItems,
   updateActionItemStatus,
 } from "../controllers/knowledgeController.js";
+import {
+  runConsolidation,
+  getConsolidationHistory,
+} from "../controllers/consolidationController.js";
 
 const router = express.Router();
 router.use(apiLimiter);
@@ -22,5 +26,20 @@ router.patch("/action-items/:id", writeLimiter, requireAdmin, updateActionItemSt
 router.get("/decisions/:id/lineage", requireOrgMembership, requirePermission("knowledge", "view"), getDecisionLineageController);
 router.get("/action-items", requireOrgMembership, requirePermission("knowledge", "view"), getOpenActionItems);
 router.patch("/action-items/:id", writeLimiter, requireOrgMembership, requirePermission("tasks", "edit"), updateActionItemStatus);
+
+// --- Memory Consolidation Engine ---
+router.post(
+  "/consolidate",
+  writeLimiter,
+  requireOrgMembership,
+  requirePermission("knowledge", "consolidate"),
+  runConsolidation,
+);
+router.get(
+  "/consolidation/history",
+  requireOrgMembership,
+  requirePermission("knowledge", "view"),
+  getConsolidationHistory,
+);
 
 export default router;
