@@ -39,7 +39,6 @@ const Contact = () => {
   const [submitting, setSubmitting] = useState(false);
 
   // Live Chat Simulator State
-  const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([
     { sender: "bot", text: "Hello! I am your MeetOnMemory virtual assistant. How can I help you today?", time: "Just now" },
@@ -391,7 +390,7 @@ const Contact = () => {
                       Submit Another Ticket
                     </button>
                     <button
-                      onClick={() => setChatOpen(true)}
+                      onClick={() => document.querySelector(".live-chat-widget")?.scrollIntoView({ behavior: "smooth" })}
                       className="px-4 py-2 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 font-semibold text-xs rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition"
                     >
                       Ask Live Assistant
@@ -430,7 +429,7 @@ const Contact = () => {
           <div className="lg:col-span-5 space-y-8">
             
             {/* Live Chat Simulator Box */}
-            <div className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col max-h-[460px]">
+            <div className="live-chat-widget bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col max-h-[460px]">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-700/60">
                 <div className="flex items-center gap-2.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
