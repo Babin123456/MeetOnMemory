@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar.jsx";
 import SearchBar from "../components/ai-search/SearchBar.jsx";
 import SearchFilters from "../components/ai-search/SearchFilters.jsx";
@@ -9,6 +10,7 @@ import { apiClient } from "../services";
 
 // Modal Component for showing full details
 const ResultModal = ({ result, onClose }) => {
+   const { t } = useTranslation();
   if (!result) return null;
 
   return (

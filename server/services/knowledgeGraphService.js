@@ -1,21 +1,28 @@
 import Decision from "../models/decisionModel.js";
 import ActionItem from "../models/actionItemModel.js";
 import { embedText } from "../utils/embeddingUtils.js";
+import { calculateRelationshipConfidence } from "../utils/relationshipScoring.js";
+import { cosineSimilarity } from "../utils/similarity.js";
 
-const SIMILARITY_THRESHOLD = 0.85; // conservative, per issue's technical considerations
+const SIMILARITY_THRESHOLD = 0.85;
+const CONFIDENCE_THRESHOLD = 70; // conservative, per issue's technical considerations
 
-function cosineSimilarity(a, b) {
-  if (!a?.length || !b?.length || a.length !== b.length) return 0;
-  let dot = 0,
-    normA = 0,
-    normB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
+function upsertRelationship(document, targetId, confidence) {
+  const existing = document.relatesTo.find(
+    (r) => r.target.toString() === targetId.toString(),
+  );
+
+  if (existing) {
+    existing.confidence = confidence;
+    existing.computedAt = new Date();
+    return;
   }
-  if (normA === 0 || normB === 0) return 0;
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+
+  document.relatesTo.push({
+    target: targetId,
+    confidence,
+    computedAt: new Date(),
+  });
 }
 
 async function findBestMatch(Model, text, embedding, organization) {
@@ -38,9 +45,21 @@ async function findBestMatch(Model, text, embedding, organization) {
     }
   }
 
-  return bestScore >= SIMILARITY_THRESHOLD ? best : null;
-}
+  if (bestScore < SIMILARITY_THRESHOLD) {
+    return null;
+  }
 
+  return {
+    match: best,
+    similarity: bestScore,
+    confidence: calculateRelationshipConfidence({
+      similarity: bestScore,
+      createdAt: best.createdAt,
+      explicitSignal:
+        best.status === "resolved" || best.status === "superseded",
+    }),
+  };
+}
 /**
  * Called after a meeting's structuredMoM is generated/updated.
  * Extracts decisions/action_items, embeds them, links to prior related entries.
@@ -71,12 +90,22 @@ export async function processStructuredMoM(meeting, mom) {
       sourceMeetingId: meeting._id,
       organization,
       embedding,
-      relatesTo: match ? [match._id] : [],
+      relatesTo:
+        match && match.confidence >= CONFIDENCE_THRESHOLD
+          ? [
+              {
+                target: match.match._id,
+                confidence: match.confidence,
+                computedAt: new Date(),
+              },
+            ]
+          : [],
     });
 
-    if (match) {
-      match.relatesTo.push(decision._id);
-      await match.save();
+    if (match && match.confidence >= CONFIDENCE_THRESHOLD) {
+      upsertRelationship(match.match, decision._id, match.confidence);
+
+      await match.match.save();
     }
 
     results.decisions.push(decision);
@@ -121,12 +150,24 @@ export async function processStructuredMoM(meeting, mom) {
       sourceMeetingId: meeting._id,
       organization,
       embedding,
-      relatesTo: match ? [match._id] : [],
+      relatesTo:
+        match && match.confidence >= CONFIDENCE_THRESHOLD
+          ? [
+              {
+                target: match.match._id,
+                confidence: match.confidence,
+                computedAt: new Date(),
+              },
+            ]
+          : [],
     });
 
     if (match) {
-      match.relatesTo.push(actionItem._id);
-      await match.save();
+      if (match.confidence >= CONFIDENCE_THRESHOLD) {
+        upsertRelationship(match.match, actionItem._id, match.confidence);
+
+        await match.match.save();
+      }
     }
 
     results.actionItems.push(actionItem);
@@ -153,8 +194,12 @@ export async function getDecisionLineage(decisionId) {
     if (!decision) return;
     chain.push(decision);
 
-    for (const relatedId of decision.relatesTo) {
-      await walk(relatedId);
+    const sortedRelations = [...decision.relatesTo]
+      .filter((r) => r.confidence >= CONFIDENCE_THRESHOLD)
+      .sort((a, b) => b.confidence - a.confidence);
+
+    for (const relation of sortedRelations) {
+      await walk(relation.target);
     }
   }
 
