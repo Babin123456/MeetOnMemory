@@ -20,6 +20,7 @@ import {
   Loader2,
   ChevronDown,
   ExternalLink,
+  GitMerge,
 } from "lucide-react";
 
 /**
@@ -263,13 +264,22 @@ const Tasks = () => {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
         {/* Header */}
-        <div className="mb-8 fade-in-up">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Tasks & Action Items
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            Track and manage action items from your meeting summaries
-          </p>
+        <div className="mb-8 fade-in-up flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+              Tasks & Action Items
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400">
+              Track and manage action items from your meeting summaries
+            </p>
+          </div>
+          <button
+            onClick={() => navigate("/knowledge/consolidate")}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+          >
+            <GitMerge className="w-4 h-4" />
+            Consolidate memories
+          </button>
         </div>
 
         {/* Search and Filters */}
@@ -433,7 +443,9 @@ const Tasks = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 fade-in-up">
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
-            <p className="text-slate-600 dark:text-slate-400">Loading tasks...</p>
+            <p className="text-slate-600 dark:text-slate-400">
+              Loading tasks...
+            </p>
           </div>
         ) : error ? (
           <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center fade-in-up">
@@ -590,7 +602,9 @@ const Tasks = () => {
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
                       {selectedTask.title}
                     </h3>
-                    <p className="text-slate-600 dark:text-slate-400">{selectedTask.description}</p>
+                    <p className="text-slate-600 dark:text-slate-400">
+                      {selectedTask.description}
+                    </p>
                   </div>
 
                   {/* Status and Priority */}

@@ -15,4 +15,14 @@ export const knowledgeApi = {
     apiClient.patch(`/api/knowledge/${type}/${id}/feedback`, { rating }),
   recalculateImportance: () =>
     apiClient.post(`/api/knowledge/importance/recalculate`),
+  // Memory Consolidation Engine
+  runConsolidation: ({ dryRun = true, models } = {}) =>
+    apiClient.post(`/api/knowledge/consolidate`, {
+      dryRun,
+      ...(models ? { models } : {}),
+    }),
+  getConsolidationHistory: (model = "decision", limit = 50) =>
+    apiClient.get(
+      `/api/knowledge/consolidation/history?model=${model}&limit=${limit}`,
+    ),
 };
