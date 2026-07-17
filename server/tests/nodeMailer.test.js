@@ -1,11 +1,20 @@
-import nodemailer from "nodemailer";
+import { jest } from "@jest/globals";
+const nodemailerMock = {
+  createTransport: jest.fn().mockReturnValue({
+    sendMail: jest.fn().mockResolvedValue({ messageId: "real-id" }),
+    verify: jest.fn().mockImplementation((cb) => cb(null, true)),
+  }),
+};
 
-jest.mock("nodemailer", () => {
+jest.unstable_mockModule("nodemailer", () => {
   return {
-    createTransport: jest.fn().mockReturnValue({
-      sendMail: jest.fn().mockResolvedValue({ messageId: "real-id" }),
-      verify: jest.fn().mockImplementation((cb) => cb(null, true)),
-    }),
+    default: nodemailerMock,
+  };
+});
+
+jest.unstable_mockModule("dotenv", () => {
+  return {
+    default: { config: jest.fn() },
   };
 });
 
@@ -62,15 +71,15 @@ describe("nodeMailer lazy initialization test", () => {
     const { default: transporter } = await import(`../config/nodeMailer.js?test=3`);
 
     // Re-verify that createTransport was NOT called simply by loading/setting env
-    expect(nodemailer.createTransport).not.toHaveBeenCalled();
+    expect(nodemailerMock.createTransport).not.toHaveBeenCalled();
 
     // Call sendMail (which should trigger lazy initialization of real transporter)
     const mailOptions = { to: "user@example.com", subject: "Real SMTP Test", text: "Real mail contents" };
     const res = await transporter.sendMail(mailOptions);
 
     // Assert createTransport was called with correct configuration
-    expect(nodemailer.createTransport).toHaveBeenCalledTimes(1);
-    expect(nodemailer.createTransport).toHaveBeenCalledWith({
+    expect(nodemailerMock.createTransport).toHaveBeenCalledTimes(1);
+    expect(nodemailerMock.createTransport).toHaveBeenCalledWith({
       host: "smtp.example.com",
       port: 465,
       secure: true,
