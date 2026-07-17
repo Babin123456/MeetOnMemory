@@ -6,7 +6,7 @@ import { calculateRelationshipConfidence } from "../utils/relationshipScoring.js
 const SIMILARITY_THRESHOLD = 0.85;
 const CONFIDENCE_THRESHOLD = 70; // conservative, per issue's technical considerations
 
-function cosineSimilarity(a, b) {
+export function cosineSimilarity(a, b) {
   if (!a?.length || !b?.length || a.length !== b.length) return 0;
   let dot = 0,
     normA = 0,
