@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { toast } from "react-toastify";
-import { meetingApi } from "../services";
+import useDragAndDrop from "./useDragAndDrop";
+import useUploadMeetingApi from "./useUploadMeetingApi";
 
 const allowedTypes = [
   "audio/wav",
@@ -22,13 +23,9 @@ const formatFileSize = (bytes) => {
 
 const useMeetingUpload = () => {
   const [file, setFile] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [meetingId, setMeetingId] = useState(null);
 
-  // Expose refs if needed by UI
   const fileInputRef = useRef(null);
 
   const validateAndSetFile = (f) => {
@@ -51,22 +48,13 @@ const useMeetingUpload = () => {
     if (f) validateAndSetFile(f);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
+  const handleDropCallback = (e) => {
     const f = e.dataTransfer.files[0];
     if (f) validateAndSetFile(f);
   };
+
+  const { isDragging, handlers } = useDragAndDrop(handleDropCallback);
+  const { uploadProgress, isUploading, uploadMeeting } = useUploadMeetingApi();
 
   const resetUpload = (setSummary, setTitle) => {
     setFile(null);
@@ -79,50 +67,18 @@ const useMeetingUpload = () => {
     }
   };
 
-  const handleUpload = async (title, setTitle) => {
+  const handleUpload = (title, setTitle) => {
     if (!file) {
       toast.error("Please select an audio file first.");
       return;
     }
-
-    try {
-      setIsUploading(true);
-      setUploadProgress(0);
-      setTranscript("");
-      setMeetingId(null);
-
-      const formData = new FormData();
-      formData.append("file", file);
-      if (title) formData.append("title", title);
-
-      const res = await meetingApi.uploadMeeting(formData, {
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total,
-          );
-          setUploadProgress(percent);
-        },
-      });
-
-      if (res.data?.success) {
-        toast.success("Transcription complete!");
-        setTranscript(res.data.transcript || "");
-        setMeetingId(res.data.meetingId || null);
-        if (res.data.autoTitle && setTitle) setTitle(res.data.autoTitle);
-      } else {
-        toast.error(res.data?.message || "Upload failed");
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-      toast.error(
-        err.response?.data?.message ||
-          err.message ||
-          "Server error during upload",
-      );
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
-    }
+    setTranscript("");
+    setMeetingId(null);
+    uploadMeeting(file, title, (data) => {
+      setTranscript(data.transcript || "");
+      setMeetingId(data.meetingId || null);
+      if (data.autoTitle && setTitle) setTitle(data.autoTitle);
+    });
   };
 
   return {
@@ -138,9 +94,9 @@ const useMeetingUpload = () => {
     fileInputRef,
     validateAndSetFile,
     handleFileChange,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
+    handleDragOver: handlers.onDragOver,
+    handleDragLeave: handlers.onDragLeave,
+    handleDrop: handlers.onDrop,
     resetUpload,
     handleUpload,
     formatFileSize,
