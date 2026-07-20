@@ -3,23 +3,7 @@ import { toast } from "react-toastify";
 import useDragAndDrop from "./useDragAndDrop";
 import useUploadMeetingApi from "./useUploadMeetingApi";
 
-const allowedTypes = [
-  "audio/wav",
-  "audio/x-wav",
-  "audio/mpeg",
-  "audio/mp3",
-  "audio/x-m4a",
-  "audio/mp4",
-  "audio/m4a",
-];
-
-const formatFileSize = (bytes) => {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-};
+import { formatFileSize, isValidAudioFile } from "../utils/fileUtils";
 
 const useMeetingUpload = () => {
   const [file, setFile] = useState(null);
@@ -30,13 +14,7 @@ const useMeetingUpload = () => {
 
   const validateAndSetFile = (f) => {
     if (!f) return;
-    const fileExt = f.name.split(".").pop().toLowerCase();
-    const allowedExtensions = ["wav", "mp3", "m4a", "mp4"];
-
-    if (
-      !allowedTypes.includes(f.type) &&
-      !allowedExtensions.includes(fileExt)
-    ) {
+    if (!isValidAudioFile(f)) {
       toast.error("Unsupported file type. Please use WAV, MP3, or M4A files.");
       return;
     }
