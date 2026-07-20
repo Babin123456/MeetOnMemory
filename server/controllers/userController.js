@@ -176,7 +176,7 @@ export const downloadExport = async (req, res) => {
       return res.status(400).json({ success: false, message: "No token provided." });
     }
 
-    const jwtSecret = process.env.JWT_SECRET || "fallback_secret";
+    const jwtSecret = process.env.JWT_SECRET;
     
     let decoded;
     try {

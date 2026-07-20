@@ -56,6 +56,11 @@ const app = express();
 app.set("trust proxy", 1); // Trust first proxy hop (Render, Vercel)
 const PORT = process.env.PORT || 4000;
 
+if (!process.env.JWT_SECRET) {
+  console.error("FATAL ERROR: JWT_SECRET environment variable is missing.");
+  process.exit(1);
+}
+
 // DATABASE & CACHE
 await connectDB();
 

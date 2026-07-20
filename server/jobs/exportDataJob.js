@@ -90,7 +90,7 @@ export default async function exportDataJob(job, app) {
     console.log(`✅ Data export for user ${userId} saved to ${filePath}`);
 
     // Generate Secure Download Link
-    const jwtSecret = process.env.JWT_SECRET || "fallback_secret";
+    const jwtSecret = process.env.JWT_SECRET;
     const downloadToken = jwt.sign({ userId, fileName }, jwtSecret, { expiresIn: "24h" });
     
     // In production, BASE_URL should be configured correctly in .env
