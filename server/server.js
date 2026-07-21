@@ -27,14 +27,14 @@ import webhookRoutes from "./routes/webhookRoutes.js";
 import slackRoutes from "./routes/slackRoutes.js";
 import transcriptRoutes from "./routes/transcriptRoutes.js";
 
-// Import slackService to register its eventBus 'mom.generated' listener.
-// The import itself is enough — the listener is set up at module load time.
+// Import slackService and cacheInvalidationService to register eventBus listeners.
 import "./services/slackService.js";
+import "./services/cacheInvalidationService.js";
 
 import { initVectorStore } from "./utils/embeddingUtils.js";
 import meetingSocket from "./socket/meetingSocket.js";
 import documentSync from "./socket/documentSync.js";
-import { initRedis, getRedisClient } from "./services/redisService.js";
+import { initRedis } from "./services/redisService.js";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import { initAIWorker, initDataExportWorker } from "./services/queueService.js";
@@ -60,7 +60,10 @@ const PORT = process.env.PORT || 4000;
 await connectDB();
 
 import { corsOptions, allowedOrigins } from "./config/corsOptions.js";
-import { csrfMiddleware, csrfTokenProvider } from "./middleware/csrfProtection.js";
+import {
+  csrfMiddleware,
+  csrfTokenProvider,
+} from "./middleware/csrfProtection.js";
 
 // MIDDLEWARES
 app.use(cors(corsOptions));
@@ -123,12 +126,15 @@ if (process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => {
     console.log(`🚀 MeetOnMemory Server running on port ${PORT}`);
 
-    setImmediate(() => {
+    (globalThis.setImmediate || setTimeout)(() => {
       const safeInit = async (name, initFn) => {
         try {
           await initFn();
         } catch (err) {
-          console.error(`⚠️ Failed to initialize background service "${name}":`, err.message || err);
+          console.error(
+            `⚠️ Failed to initialize background service "${name}":`,
+            err.message || err,
+          );
         }
       };
 
