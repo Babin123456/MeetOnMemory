@@ -148,7 +148,8 @@ export async function detectContradiction(
   }
 
   const isContradiction =
-    aiResult.relation === "contradiction" && aiResult.confidence >= minConfidence;
+    aiResult.relation === "contradiction" &&
+    aiResult.confidence >= minConfidence;
 
   return {
     isContradiction,
@@ -156,7 +157,9 @@ export async function detectContradiction(
     // overridden by a noisy AI call, and vice versa — both must broadly
     // agree for high confidence.
     confidence: isContradiction
-      ? Math.round((aiResult.confidence + Math.max(heuristic.confidence, 40)) / 2)
+      ? Math.round(
+          (aiResult.confidence + Math.max(heuristic.confidence, 40)) / 2,
+        )
       : aiResult.confidence,
     signals: heuristic.signals,
     explanation: aiResult.explanation || heuristic.explanation,

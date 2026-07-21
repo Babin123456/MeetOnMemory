@@ -144,7 +144,13 @@ export async function storeConflictCluster(
  */
 export async function resolveConflictSet(
   conflictId,
-  { resolutionType, keptMemoryId = null, customValue = "", note = "", resolvedBy = null } = {},
+  {
+    resolutionType,
+    keptMemoryId = null,
+    customValue = "",
+    note = "",
+    resolvedBy = null,
+  } = {},
 ) {
   const conflict = await ConflictSet.findById(conflictId);
   if (!conflict) {

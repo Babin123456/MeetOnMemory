@@ -7,7 +7,7 @@
 // them (see server.js's "mom.generated" listener).
 // ==============================================
 
-import { detectConflicts } from "../services/conflictDetectionService.js";
+import { detectConflicts } from "./conflictDetectionService.js";
 
 /**
  * @param {import("bullmq").Job} job - job.data: { organization }

@@ -201,7 +201,18 @@ const Tasks = () => {
         break;
       }
       case "createdDate": {
-        comparison = new Date(a.meetingDate) - new Date(b.meetingDate);
+        const aTime = a.meetingDate ? new Date(a.meetingDate).getTime() : null;
+        const bTime = b.meetingDate ? new Date(b.meetingDate).getTime() : null;
+
+        if (aTime === null && bTime === null) {
+          comparison = 0;
+        } else if (aTime === null) {
+          comparison = 1; // a goes to the end
+        } else if (bTime === null) {
+          comparison = -1; // b goes to the end
+        } else {
+          comparison = aTime - bTime;
+        }
         break;
       }
       case "priority": {
@@ -490,11 +501,9 @@ const Tasks = () => {
         ) : (
           <div className="grid gap-4 fade-in-up stagger-3">
             {sortedTasks.map((task) => {
-              const statusStyle =
-                STATUS_STYLES[task.status] || STATUS_STYLES["to-do"];
-              const priorityStyle =
-                PRIORITY_STYLES[task.priority] || PRIORITY_STYLES.medium;
-              const StatusIcon = statusStyle.icon;
+              const statusStyle = STATUS_STYLES[task.status] || {};
+              const priorityStyle = PRIORITY_STYLES[task.priority] || {};
+              const StatusIcon = statusStyle.icon || Clock;
 
               return (
                 <div
@@ -512,7 +521,7 @@ const Tasks = () => {
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${priorityStyle.bgColor} ${priorityStyle.textColor} ${priorityStyle.borderColor} shrink-0`}
                         >
-                          {priorityStyle.label}
+                          {priorityStyle.label || task.priority}
                         </span>
                         {typeof task.importanceScore === "number" && (
                           <span
@@ -530,7 +539,7 @@ const Tasks = () => {
                           className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium border ${statusStyle.bgColor} ${statusStyle.textColor} ${statusStyle.borderColor}`}
                         >
                           <StatusIcon className="w-3.5 h-3.5" />
-                          {statusStyle.label}
+                          {statusStyle.label || task.status}
                         </span>
 
                         {/* Due Date */}
@@ -669,9 +678,19 @@ const Tasks = () => {
                         <Building2 className="w-4 h-4" />
                         Organization
                       </div>
-                      <p className="font-medium text-slate-900 dark:text-white">
-                        {selectedTask.organization}
-                      </p>
+                      {selectedTask.meetingDate && (
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-1">
+                            <Calendar className="w-4 h-4" />
+                            Meeting Date
+                          </div>
+                          <p className="font-medium text-slate-900 dark:text-white">
+                            {new Date(
+                              selectedTask.meetingDate,
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">

@@ -5,7 +5,7 @@ import {
   getConflictSetById,
   resolveConflictSet,
   MODEL_REGISTRY,
-} from "../services/conflictDetectionService.js";
+} from "../services/conflictDetection/conflictDetectionService.js";
 
 const VALID_MODEL_TYPES = Object.keys(MODEL_REGISTRY);
 const VALID_STATUSES = ["open", "resolved", "dismissed", "all"];
@@ -30,7 +30,12 @@ function parseModelsParam(rawModels) {
 export const scanForConflicts = async (req, res) => {
   try {
     const organization = req.user.organization || null;
-    const { dryRun = true, models, useAI = true, minConfidence } = req.body || {};
+    const {
+      dryRun = true,
+      models,
+      useAI = true,
+      minConfidence,
+    } = req.body || {};
 
     const modelTypes = parseModelsParam(models);
     const invalid = modelTypes.filter((m) => !VALID_MODEL_TYPES.includes(m));
@@ -43,7 +48,9 @@ export const scanForConflicts = async (req, res) => {
 
     if (
       minConfidence !== undefined &&
-      (typeof minConfidence !== "number" || minConfidence < 0 || minConfidence > 100)
+      (typeof minConfidence !== "number" ||
+        minConfidence < 0 ||
+        minConfidence > 100)
     ) {
       return res.status(400).json({
         success: false,
@@ -106,7 +113,8 @@ export const getConflicts = async (req, res) => {
     }
 
     const parsedLimit = Number(limit);
-    const safeLimit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
+    const safeLimit =
+      Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
 
     const conflicts = await listConflictSets(model, {
       organization,
@@ -133,11 +141,15 @@ export const getConflictDetail = async (req, res) => {
   try {
     const conflict = await getConflictSetById(req.params.id);
     if (!conflict) {
-      return res.status(404).json({ success: false, message: "Conflict set not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Conflict set not found" });
     }
 
     const organization = req.user.organization || null;
-    const conflictOrg = conflict.organization ? conflict.organization.toString() : null;
+    const conflictOrg = conflict.organization
+      ? conflict.organization.toString()
+      : null;
     if (conflictOrg !== (organization ? organization.toString() : null)) {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
@@ -163,11 +175,15 @@ export const resolveConflict = async (req, res) => {
   try {
     const conflict = await getConflictSetById(req.params.id);
     if (!conflict) {
-      return res.status(404).json({ success: false, message: "Conflict set not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Conflict set not found" });
     }
 
     const organization = req.user.organization || null;
-    const conflictOrg = conflict.organization ? conflict.organization.toString() : null;
+    const conflictOrg = conflict.organization
+      ? conflict.organization.toString()
+      : null;
     if (conflictOrg !== (organization ? organization.toString() : null)) {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
@@ -206,7 +222,9 @@ export const resolveConflict = async (req, res) => {
       "Invalid resolutionType",
       "keptMemoryId must reference",
     ];
-    const isClientError = clientErrors.some((msg) => error.message?.includes(msg));
+    const isClientError = clientErrors.some((msg) =>
+      error.message?.includes(msg),
+    );
     res.status(isClientError ? 400 : 500).json({
       success: false,
       message: error.message || "Failed to resolve conflict",

@@ -21,7 +21,7 @@
 import {
   MODEL_REGISTRY,
   assertSupportedModel,
-} from "./consolidation/consolidationRegistry.js";
+} from "../consolidation/consolidationRegistry.js";
 import {
   DEFAULT_MIN_CONFIDENCE,
   DEFAULT_TOPIC_EMBEDDING_THRESHOLD,
@@ -59,10 +59,12 @@ export async function detectConflictsForModel(
 
   const records = await fetchMemoriesForConflictScan(Model, organization);
 
-  const { clusters, pairwiseByCluster } = await buildConflictClusters(
-    records,
-    { useAI, minConfidence, topicEmbeddingThreshold, duplicateEmbeddingCeiling },
-  );
+  const { clusters, pairwiseByCluster } = await buildConflictClusters(records, {
+    useAI,
+    minConfidence,
+    topicEmbeddingThreshold,
+    duplicateEmbeddingCeiling,
+  });
 
   const conflictSummaries = [];
   for (let i = 0; i < clusters.length; i++) {

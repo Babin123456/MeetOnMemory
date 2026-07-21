@@ -12,7 +12,7 @@ import {
   detectConflicts,
   resolveConflictSet,
   listConflictSets,
-} from "../services/conflictDetectionService.js";
+} from "../services/conflictDetection/conflictDetectionService.js";
 
 const organizationId = new mongoose.Types.ObjectId();
 const meetingA = new mongoose.Types.ObjectId();
@@ -152,8 +152,16 @@ describe("buildConflictClusters", () => {
 
   test("returns no clusters when nothing conflicts", async () => {
     const records = [
-      { _id: new mongoose.Types.ObjectId(), text: "Ship the report", embedding: [] },
-      { _id: new mongoose.Types.ObjectId(), text: "Renew the domain", embedding: [] },
+      {
+        _id: new mongoose.Types.ObjectId(),
+        text: "Ship the report",
+        embedding: [],
+      },
+      {
+        _id: new mongoose.Types.ObjectId(),
+        text: "Renew the domain",
+        embedding: [],
+      },
     ];
     const { clusters } = await buildConflictClusters(records, { useAI: false });
     expect(clusters).toHaveLength(0);
@@ -301,11 +309,15 @@ describe("resolveConflictSet", () => {
 
     expect(resolved.status).toBe("resolved");
     expect(resolved.resolution.type).toBe("kept_member");
-    expect(resolved.resolution.keptMemoryId.toString()).toBe(newer._id.toString());
+    expect(resolved.resolution.keptMemoryId.toString()).toBe(
+      newer._id.toString(),
+    );
 
     const reloadedOlder = await Decision.findById(older._id);
     expect(reloadedOlder.status).toBe("superseded");
-    expect(reloadedOlder.supersededByMemory.toString()).toBe(newer._id.toString());
+    expect(reloadedOlder.supersededByMemory.toString()).toBe(
+      newer._id.toString(),
+    );
     // Text is preserved, never overwritten — this isn't a merge.
     expect(reloadedOlder.text).toBe("Frontend owner is Alice");
 
@@ -355,8 +367,16 @@ describe("resolveConflictSet", () => {
 
   test("dismissed resolution marks the conflict dismissed without touching members", async () => {
     const [a, b] = await Decision.create([
-      { text: "Database is PostgreSQL", sourceMeetingId: meetingA, organization: organizationId },
-      { text: "Database migrated to MongoDB", sourceMeetingId: meetingB, organization: organizationId },
+      {
+        text: "Database is PostgreSQL",
+        sourceMeetingId: meetingA,
+        organization: organizationId,
+      },
+      {
+        text: "Database migrated to MongoDB",
+        sourceMeetingId: meetingB,
+        organization: organizationId,
+      },
     ]);
 
     await detectConflicts({
@@ -386,8 +406,16 @@ describe("resolveConflictSet", () => {
 
   test("rejects resolving an already-resolved conflict", async () => {
     const [, newer] = await Decision.create([
-      { text: "Frontend owner is Alice", sourceMeetingId: meetingA, organization: organizationId },
-      { text: "Frontend owner is Bob", sourceMeetingId: meetingB, organization: organizationId },
+      {
+        text: "Frontend owner is Alice",
+        sourceMeetingId: meetingA,
+        organization: organizationId,
+      },
+      {
+        text: "Frontend owner is Bob",
+        sourceMeetingId: meetingB,
+        organization: organizationId,
+      },
     ]);
 
     await detectConflicts({
@@ -414,8 +442,16 @@ describe("resolveConflictSet", () => {
 
   test("rejects an invalid keptMemoryId not belonging to the conflict", async () => {
     await Decision.create([
-      { text: "Frontend owner is Alice", sourceMeetingId: meetingA, organization: organizationId },
-      { text: "Frontend owner is Bob", sourceMeetingId: meetingB, organization: organizationId },
+      {
+        text: "Frontend owner is Alice",
+        sourceMeetingId: meetingA,
+        organization: organizationId,
+      },
+      {
+        text: "Frontend owner is Bob",
+        sourceMeetingId: meetingB,
+        organization: organizationId,
+      },
     ]);
 
     await detectConflicts({

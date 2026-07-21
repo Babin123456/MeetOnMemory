@@ -67,6 +67,12 @@ export async function buildGraph(organization) {
     if (!nodes.has(key)) nodes.set(key, data);
     if (!adjacency.has(key)) adjacency.set(key, []);
   };
+   
+  const ensureAdjacency = (key) => {
+    if (!adjacency.has(key)) {
+      adjacency.set(key, []);
+    }
+  };
 
   const addEdge = (keyA, keyB, weight) => {
     if (keyA === keyB) return;
