@@ -123,12 +123,10 @@ describe("InvitationService", () => {
         lean: vi.fn().mockResolvedValue({ role: "admin", status: "active" }),
       });
       userModel.findOne.mockReturnValue({
-        lean: vi
-          .fn()
-          .mockResolvedValue({
-            _id: "existingUser",
-            email: "test@example.com",
-          }),
+        lean: vi.fn().mockResolvedValue({
+          _id: "existingUser",
+          email: "test@example.com",
+        }),
       });
 
       // Second findOne for existing membership check
