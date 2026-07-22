@@ -482,7 +482,7 @@ describe("listConflictSets input validation", () => {
         organization: organizationId,
         status: { $ne: "open" },
       }),
-    ).resolves.not.toThrow();
+    ).resolves.toEqual(expect.any(Array));
   });
 
   test("uses the default limit for invalid values", async () => {
@@ -491,6 +491,6 @@ describe("listConflictSets input validation", () => {
         organization: organizationId,
         limit: { $gt: 100 },
       }),
-    ).resolves.not.toThrow();
+    ).resolves.toEqual(expect.any(Array));
   });
 });

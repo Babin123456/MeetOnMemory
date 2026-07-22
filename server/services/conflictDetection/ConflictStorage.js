@@ -5,7 +5,7 @@
 // dedupes against conflicts already under review, and applies a user's
 // resolution back onto the knowledge graph.
 // ==============================================
-
+import mongoose from "mongoose";
 import ConflictSet from "../../models/conflictModel.js";
 import { assertSupportedModel } from "../consolidation/consolidationRegistry.js";
 
@@ -227,11 +227,14 @@ export async function listConflictSets(
 ) {
   const query = {};
 
-  if (
-    organization === null ||
-    typeof organization === "string" ||
-    (organization && typeof organization === "object")
+  if (organization === null) {
+    query.organization = null;
+  } else if (
+    typeof organization === "string" &&
+    mongoose.Types.ObjectId.isValid(organization)
   ) {
+    query.organization = organization;
+  } else if (organization instanceof mongoose.Types.ObjectId) {
     query.organization = organization;
   }
 
