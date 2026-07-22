@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Calendar, Clock, User, Loader2, CheckCircle2, XCircle } from "lucide-react";
 
@@ -18,14 +18,7 @@ const AvailabilityGrid = ({ participants, selectedDate, onSlotSelect }) => {
     setTimeSlots(slots);
   }, []);
 
-  // Fetch availability when date or participants change
-  useEffect(() => {
-    if (selectedDate && participants.length > 0) {
-      fetchAvailability();
-    }
-  }, [selectedDate, participants]);
-
-  const fetchAvailability = async () => {
+  const fetchAvailability = useCallback(async () => {
     if (!selectedDate || participants.length === 0) return;
 
     setLoading(true);
@@ -66,7 +59,14 @@ const AvailabilityGrid = ({ participants, selectedDate, onSlotSelect }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, participants]);
+
+  // Fetch availability when date or participants change
+  useEffect(() => {
+    if (selectedDate && participants.length > 0) {
+      fetchAvailability();
+    }
+  }, [selectedDate, participants, fetchAvailability]);
 
   const getSlotAvailability = (timeSlot) => {
     if (!availabilityData) return "unknown";

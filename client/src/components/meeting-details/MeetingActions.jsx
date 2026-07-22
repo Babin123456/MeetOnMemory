@@ -21,8 +21,6 @@ const MeetingActions = ({ meeting, onDelete, onRename }) => {
   const chunksRef = useRef([]);
   const recordingIntervalRef = useRef(null);
 
-  if (!meeting) return null;
-
   const handleDownloadTranscript = () => {
     if (!meeting.transcript) {
       alert("No transcript available to download.");
@@ -221,6 +219,8 @@ const MeetingActions = ({ meeting, onDelete, onRename }) => {
       }
     };
   }, [isRecording]);
+
+  if (!meeting) return null;
 
   return (
     <>

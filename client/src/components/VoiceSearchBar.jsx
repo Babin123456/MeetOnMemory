@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, MicOff, Search, Loader2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -10,6 +10,50 @@ const VoiceSearchBar = ({ onResults }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
+
+  const finalTranscriptRef = useRef(finalTranscript);
+  const handleSearchRef = useRef(null);
+
+  useEffect(() => {
+    finalTranscriptRef.current = finalTranscript;
+  }, [finalTranscript]);
+
+  const handleSearch = useCallback(async (query) => {
+    if (!query || query.trim().length < 3) {
+      toast.error("Please speak a longer query (minimum 3 characters)");
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const { data } = await axios.get("/api/search/voice", {
+        params: { query: query.trim() },
+        withCredentials: true,
+      });
+
+      if (data.success) {
+        setResults(data.results || []);
+        if (onResults) {
+          onResults(data.results || []);
+        }
+        
+        if (data.results.length === 0) {
+          toast.info("No results found for your query");
+        } else {
+          toast.success(`Found ${data.results.length} result(s)`);
+        }
+      }
+    } catch (error) {
+      console.error("Voice search error:", error);
+      toast.error(error.response?.data?.message || "Search failed");
+    } finally {
+      setIsSearching(false);
+    }
+  }, [onResults]);
+
+  useEffect(() => {
+    handleSearchRef.current = handleSearch;
+  }, [handleSearch]);
 
   useEffect(() => {
     // Check if browser supports speech recognition
@@ -32,8 +76,8 @@ const VoiceSearchBar = ({ onResults }) => {
 
     recognition.onend = () => {
       setIsListening(false);
-      if (finalTranscript) {
-        handleSearch(finalTranscript);
+      if (finalTranscriptRef.current && handleSearchRef.current) {
+        handleSearchRef.current(finalTranscriptRef.current);
       }
     };
 
@@ -93,39 +137,6 @@ const VoiceSearchBar = ({ onResults }) => {
   const stopListening = () => {
     if (window.recognitionInstance) {
       window.recognitionInstance.stop();
-    }
-  };
-
-  const handleSearch = async (query) => {
-    if (!query || query.trim().length < 3) {
-      toast.error("Please speak a longer query (minimum 3 characters)");
-      return;
-    }
-
-    try {
-      setIsSearching(true);
-      const { data } = await axios.get("/api/search/voice", {
-        params: { query: query.trim() },
-        withCredentials: true,
-      });
-
-      if (data.success) {
-        setResults(data.results || []);
-        if (onResults) {
-          onResults(data.results || []);
-        }
-        
-        if (data.results.length === 0) {
-          toast.info("No results found for your query");
-        } else {
-          toast.success(`Found ${data.results.length} result(s)`);
-        }
-      }
-    } catch (error) {
-      console.error("Voice search error:", error);
-      toast.error(error.response?.data?.message || "Search failed");
-    } finally {
-      setIsSearching(false);
     }
   };
 
