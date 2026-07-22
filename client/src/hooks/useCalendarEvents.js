@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { meetingApi } from "../services";
 import axios from "axios";
-import { AppContent } from "../context/AppContent";
+import AppContent from "../context/AppContent";
 
 export const useCalendarEvents = () => {
   const { backendUrl } = useContext(AppContent);
