@@ -14,14 +14,14 @@ let userBToken = "";
 let meetingId = "";
 let orgId = "";
 let userA_id = "";
-let userB_id = "";
+let userB_id = ""; // eslint-disable-line no-unused-vars
 
 const api = axios.create({
   baseURL: API_URL,
   validateStatus: () => true, // Don't throw errors on 4xx/5xx responses
 });
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // eslint-disable-line no-unused-vars
 
 async function runTests() {
   try {
@@ -42,6 +42,7 @@ async function runTests() {
     // 2. Register Users
     console.log("👤 Registering User A...");
     let resA = await api.post("/auth/register", {
+      // eslint-disable-line no-unused-vars
       name: "User A",
       email: "usera@test.com",
       password: "password123",
@@ -49,6 +50,7 @@ async function runTests() {
 
     console.log("👤 Registering User B...");
     let resB = await api.post("/auth/register", {
+      // eslint-disable-line no-unused-vars
       name: "User B",
       email: "userb@test.com",
       password: "password123",

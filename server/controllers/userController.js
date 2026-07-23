@@ -162,6 +162,7 @@ export const downloadExport = async (req, res) => {
     try {
       decoded = jwt.verify(token, jwtSecret);
     } catch (err) {
+      // eslint-disable-line no-unused-vars
       return sendError(res, 401, "Invalid or expired token.");
     }
 

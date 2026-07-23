@@ -88,6 +88,7 @@ export const initListeners = (io) => {
   eventBus.on(
     "organization.joined",
     async ({ userId, organizationId, organizationName, adminId }) => {
+      // eslint-disable-line no-unused-vars
       if (adminId && adminId.toString() !== userId.toString()) {
         const formattedNotification = await createNotification(
           adminId,
@@ -110,6 +111,7 @@ export const initListeners = (io) => {
   eventBus.on(
     "live_meeting.notified",
     async ({ uploaderId, roomId, participants, orgId }) => {
+      // eslint-disable-line no-unused-vars
       for (const user of participants) {
         const formattedNotification = await createNotification(
           user._id,

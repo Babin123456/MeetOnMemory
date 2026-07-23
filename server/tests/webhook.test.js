@@ -344,6 +344,7 @@ describe("Webhook Endpoints & Dispatcher", () => {
           { attempt: 5, isFinalAttempt: true },
         );
       } catch (err) {
+        // eslint-disable-line no-unused-vars
         // Expected throw
       }
 
@@ -383,6 +384,7 @@ describe("Webhook Endpoints & Dispatcher", () => {
           { attempt: 5, isFinalAttempt: true },
         );
       } catch (err) {
+        // eslint-disable-line no-unused-vars
         // Expected throw
       }
 

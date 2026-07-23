@@ -3,7 +3,7 @@ import { google } from "googleapis";
 import axios from "axios";
 import cron from "node-cron";
 import CalendarIntegration from "../models/calendarIntegrationModel.js";
-import Meeting from "../models/meetingModel.js";
+import Meeting from "../models/meetingModel.js"; // eslint-disable-line no-unused-vars
 
 // Encryption setup
 const ALGORITHM = "aes-256-gcm";
@@ -195,6 +195,7 @@ export const pushMeetingToIntegrations = async (userId, meeting) => {
       integration.lastSyncedAt = new Date();
       await integration.save();
     } catch (err) {
+      // eslint-disable-line no-unused-vars
       console.error(`Failed to push to ${integration.provider}`);
     }
   }

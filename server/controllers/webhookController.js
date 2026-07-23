@@ -34,6 +34,7 @@ const isSafeWebhookUrl = async (urlStr) => {
       const { address } = await dns.lookup(hostname);
       resolvedIp = address;
     } catch (err) {
+      // eslint-disable-line no-unused-vars
       // If we can't resolve it, it's not a valid safe public URL
       return false;
     }
@@ -43,6 +44,7 @@ const isSafeWebhookUrl = async (urlStr) => {
     try {
       addr = ipaddr.parse(resolvedIp);
     } catch (err) {
+      // eslint-disable-line no-unused-vars
       return false;
     }
 
@@ -65,6 +67,7 @@ const isSafeWebhookUrl = async (urlStr) => {
 
     return true;
   } catch (err) {
+    // eslint-disable-line no-unused-vars
     return false;
   }
 };

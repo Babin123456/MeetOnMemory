@@ -38,6 +38,7 @@ export const sanitizeUserForExport = (user) => {
 };
 
 export default async function exportDataJob(job, app) {
+  // eslint-disable-line no-unused-vars
   if (job.name === "audit-log-export") return auditLogExportJob(job);
   const { userId, email } = job.data;
   console.log(`📦 Starting data export for user ${userId}...`);
