@@ -15,8 +15,7 @@ import {
   buildHumanReadableMoM,
 } from "../services/GenerativeAIService.js";
 
-export default async function processAudioJob(job, app) {
-  // eslint-disable-line no-unused-vars
+export default async function processAudioJob(job, _app) {
   const { meetingId, transcript, date, title, userId } = job.data;
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // eslint-disable-line no-unused-vars
   const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash"; // eslint-disable-line no-unused-vars

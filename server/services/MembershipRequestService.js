@@ -454,8 +454,7 @@ class MembershipRequestService {
           membershipId: newMembership._id,
           status: "approved",
         });
-      } catch (error) {
-        // eslint-disable-line no-unused-vars
+      } catch (_error) {
         await session.abortTransaction();
         errors.push({
           requestId: request._id,

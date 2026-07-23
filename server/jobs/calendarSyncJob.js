@@ -108,8 +108,7 @@ const syncUserCalendar = async (userId, provider) => {
           `Creating new meeting from ${provider} event: ${externalEventTitle}`,
         );
 
-        const newMeeting = await Meeting.create({
-          // eslint-disable-line no-unused-vars
+        const _newMeeting = await Meeting.create({
           uploadedBy: userId,
           title: externalEventTitle,
           description: externalEvent.description || "",

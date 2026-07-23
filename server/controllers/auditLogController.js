@@ -150,8 +150,7 @@ export const getAuditLogExport = async (req, res) => {
           exportRecord.status === "failed" ? exportRecord.error : undefined,
       },
     });
-  } catch (error) {
-    // eslint-disable-line no-unused-vars
+  } catch (_error) {
     return sendError(res, 500, "Server error fetching audit log export.");
   }
 };
@@ -177,8 +176,7 @@ export const downloadAuditLogExport = async (req, res) => {
       return sendError(res, 404, "Audit log export file not found.");
     }
     return res.download(filePath, `audit-logs.${exportRecord.format}`);
-  } catch (error) {
-    // eslint-disable-line no-unused-vars
+  } catch (_error) {
     return sendError(res, 500, "Server error downloading audit log export.");
   }
 };

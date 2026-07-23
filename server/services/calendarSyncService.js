@@ -194,8 +194,7 @@ export const pushMeetingToIntegrations = async (userId, meeting) => {
       }
       integration.lastSyncedAt = new Date();
       await integration.save();
-    } catch (err) {
-      // eslint-disable-line no-unused-vars
+    } catch (_err) {
       console.error(`Failed to push to ${integration.provider}`);
     }
   }

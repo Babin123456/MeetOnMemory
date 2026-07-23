@@ -43,21 +43,21 @@ The pipeline runs **5 independent parallel jobs**. Each job fails independently 
 
 **Purpose:** Enforce consistent formatting and catch static analysis errors.
 
-| Check | Scope | Tool |
-|-------|-------|------|
-| Formatting | Changed files only | Prettier |
-| Linting (server) | `server/**/*.js` | ESLint (flat config) |
+| Check            | Scope                  | Tool                   |
+| ---------------- | ---------------------- | ---------------------- |
+| Formatting       | Changed files only     | Prettier               |
+| Linting (server) | `server/**/*.js`       | ESLint (flat config)   |
 | Linting (client) | `client/**/*.{js,jsx}` | ESLint + React plugins |
 
 ### 2. Backend Validation
 
 **Purpose:** Verify the server builds, passes all tests, and can start without crashes.
 
-| Step | What it does |
-|------|--------------|
-| `npm ci` | Clean install of server dependencies |
-| `npm run lint` | ESLint checks |
-| `npm run test:ci` | Runs all Jest test suites with `--ci --coverage` |
+| Step                   | What it does                                                         |
+| ---------------------- | -------------------------------------------------------------------- |
+| `npm ci`               | Clean install of server dependencies                                 |
+| `npm run lint`         | ESLint checks                                                        |
+| `npm run test:ci`      | Runs all Jest test suites with `--ci --coverage`                     |
 | `npm run test:startup` | Validates module imports, service initialization, and queue wrappers |
 
 Coverage reports are uploaded as GitHub Actions artifacts (retained for 14 days).
@@ -66,19 +66,19 @@ Coverage reports are uploaded as GitHub Actions artifacts (retained for 14 days)
 
 **Purpose:** Ensure the client compiles, passes tests, and produces a deployable build.
 
-| Step | What it does |
-|------|--------------|
-| `npm ci` | Clean install of client dependencies |
-| `npm run lint` | ESLint checks |
-| `npm run test:ci` | Runs all Vitest test suites in single-run mode |
-| `npm run build` | Full Vite production build — catches import errors, missing modules, and TypeScript/JSX issues |
+| Step              | What it does                                                                                   |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `npm ci`          | Clean install of client dependencies                                                           |
+| `npm run lint`    | ESLint checks                                                                                  |
+| `npm run test:ci` | Runs all Vitest test suites in single-run mode                                                 |
+| `npm run build`   | Full Vite production build — catches import errors, missing modules, and TypeScript/JSX issues |
 
 ### 4. Security Checks
 
 **Purpose:** Detect known vulnerabilities in dependencies.
 
-| Step | Threshold |
-|------|-----------|
+| Step               | Threshold            |
+| ------------------ | -------------------- |
 | Server `npm audit` | `--audit-level=high` |
 | Client `npm audit` | `--audit-level=high` |
 
@@ -89,6 +89,7 @@ Only **high** and **critical** severity vulnerabilities cause a build failure. M
 **Purpose:** Verify critical API endpoints work end-to-end using `supertest` with an in-memory MongoDB instance.
 
 **Covered endpoints:**
+
 - Health check (`/api/health`, `/health`)
 - CSRF token (`/api/csrf-token`)
 - Authentication (register, login, session validation, wrong-password rejection)
@@ -107,11 +108,11 @@ Only **high** and **critical** severity vulnerabilities cause a build failure. M
 
 These workflows run independently from the main CI pipeline:
 
-| Workflow | File | Trigger |
-|----------|------|---------|
-| CodeQL Security Analysis | `codeql.yml` | Push, PR, weekly schedule |
-| Keep-Alive Health Check | `health-check.yml` | Every 10 min (cron) |
-| PR Validation | `05-pr-check.yml` | PR events |
+| Workflow                 | File               | Trigger                   |
+| ------------------------ | ------------------ | ------------------------- |
+| CodeQL Security Analysis | `codeql.yml`       | Push, PR, weekly schedule |
+| Keep-Alive Health Check  | `health-check.yml` | Every 10 min (cron)       |
+| PR Validation            | `05-pr-check.yml`  | PR events                 |
 
 ---
 
@@ -203,15 +204,15 @@ cd client && npm audit --audit-level=high || true
 
 ### Common CI Failures
 
-| Issue | Fix |
-|-------|-----|
-| Prettier formatting error | Run `npm run format` from the repo root |
-| ESLint error (server) | Run `npm run lint --prefix server` locally and fix warnings/errors |
-| ESLint error (client) | Run `npm run lint --prefix client` locally and fix warnings/errors |
-| Test timeout | Increase `testTimeout` in `server/jest.config.js` (default: 30s) |
-| MongoMemoryServer download failure | Check network access; the binary is cached after first download |
-| Build failure (client) | Run `npm run build --prefix client` locally to see the exact error |
-| `npm audit` failure | Run `npm audit fix` to auto-fix, or `npm audit` to see details |
+| Issue                              | Fix                                                                |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| Prettier formatting error          | Run `npm run format` from the repo root                            |
+| ESLint error (server)              | Run `npm run lint --prefix server` locally and fix warnings/errors |
+| ESLint error (client)              | Run `npm run lint --prefix client` locally and fix warnings/errors |
+| Test timeout                       | Increase `testTimeout` in `server/jest.config.js` (default: 30s)   |
+| MongoMemoryServer download failure | Check network access; the binary is cached after first download    |
+| Build failure (client)             | Run `npm run build --prefix client` locally to see the exact error |
+| `npm audit` failure                | Run `npm audit fix` to auto-fix, or `npm audit` to see details     |
 
 ### Worker process force-exit warnings
 

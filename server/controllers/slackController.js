@@ -134,8 +134,7 @@ export const slackOAuthRedirect = async (req, res, next) => {
     let decodedState;
     try {
       decodedState = jwt.verify(stateToken, process.env.JWT_SECRET);
-    } catch (err) {
-      // eslint-disable-line no-unused-vars
+    } catch (_err) {
       return sendError(res, 400, "Invalid or expired OAuth state.");
     }
 

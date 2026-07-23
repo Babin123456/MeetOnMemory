@@ -182,8 +182,7 @@ export const performDispatch = async (webhookId, payload, options = {}) => {
     const deliveryStatus = isFinalAttempt ? "dlq" : "failed";
 
     // Create failed/dlq delivery record
-    const delivery = await WebhookDelivery.create({
-      // eslint-disable-line no-unused-vars
+    const _delivery = await WebhookDelivery.create({
       webhookId: webhook._id,
       organizationId: webhook.organizationId,
       event: payload.event || "custom",

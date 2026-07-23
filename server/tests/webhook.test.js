@@ -343,8 +343,7 @@ describe("Webhook Endpoints & Dispatcher", () => {
           { event: "meeting.created" },
           { attempt: 5, isFinalAttempt: true },
         );
-      } catch (err) {
-        // eslint-disable-line no-unused-vars
+      } catch (_err) {
         // Expected throw
       }
 
@@ -383,8 +382,7 @@ describe("Webhook Endpoints & Dispatcher", () => {
           { event: "meeting.created" },
           { attempt: 5, isFinalAttempt: true },
         );
-      } catch (err) {
-        // eslint-disable-line no-unused-vars
+      } catch (_err) {
         // Expected throw
       }
 

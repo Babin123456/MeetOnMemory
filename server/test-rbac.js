@@ -41,16 +41,14 @@ async function runTests() {
 
     // 2. Register Users
     console.log("👤 Registering User A...");
-    let resA = await api.post("/auth/register", {
-      // eslint-disable-line no-unused-vars
+    let _resA = await api.post("/auth/register", {
       name: "User A",
       email: "usera@test.com",
       password: "password123",
     });
 
     console.log("👤 Registering User B...");
-    let resB = await api.post("/auth/register", {
-      // eslint-disable-line no-unused-vars
+    let _resB = await api.post("/auth/register", {
       name: "User B",
       email: "userb@test.com",
       password: "password123",

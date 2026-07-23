@@ -5,8 +5,7 @@ let RedisStore;
 try {
   const mod = await import("rate-limit-redis");
   RedisStore = mod.RedisStore || mod.default;
-} catch (e) {
-  // eslint-disable-line no-unused-vars
+} catch (_e) {
   // rate-limit-redis optional dependency fallback
 }
 
