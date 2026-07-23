@@ -234,34 +234,28 @@ export const getPublicResource = async (req, res) => {
     if (link.passcode) {
       const token = req.cookies.shared_access_token;
       if (!token) {
-        return res
-          .status(401)
-          .json({
-            success: false,
-            message: "Passcode required",
-            requiresPasscode: true,
-          });
+        return res.status(401).json({
+          success: false,
+          message: "Passcode required",
+          requiresPasscode: true,
+        });
       }
 
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.hash !== hash) {
-          return res
-            .status(401)
-            .json({
-              success: false,
-              message: "Invalid access token",
-              requiresPasscode: true,
-            });
-        }
-      } catch (err) {
-        return res
-          .status(401)
-          .json({
+          return res.status(401).json({
             success: false,
-            message: "Session expired, please re-enter passcode",
+            message: "Invalid access token",
             requiresPasscode: true,
           });
+        }
+      } catch (err) {
+        return res.status(401).json({
+          success: false,
+          message: "Session expired, please re-enter passcode",
+          requiresPasscode: true,
+        });
       }
     }
 
